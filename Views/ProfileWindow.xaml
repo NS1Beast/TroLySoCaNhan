@@ -1,0 +1,230 @@
+<ui:FluentWindow x:Class="TroLySoCaNhan.Views.ProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:local="clr-namespace:TroLySoCaNhan.Views"
+        xmlns:vm="clr-namespace:TroLySoCaNhan.ViewModels"
+        xmlns:models="clr-namespace:TroLySoCaNhan.Models"
+        xmlns:helpers="clr-namespace:TroLySoCaNhan.MVVM.Converters"
+        mc:Ignorable="d"
+        Title="Hồ sơ &amp; Cài đặt"
+        Height="640" Width="780"
+        WindowBackdropType="Mica"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner">
+
+    <ui:FluentWindow.Resources>
+        <!-- Style chung cho card trong từng tab -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style>
+        <Style x:Key="FieldValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="Hồ sơ &amp; Cài đặt">
+            <ui:TitleBar.Icon>
+                <ui:SymbolIcon Symbol="Person24" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+
+        <ui:TabView Grid.Row="1" Margin="16">
+            <!-- ==================== TAB HỒ SƠ ==================== -->
+            <ui:TabViewItem Header="Hồ sơ">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4">
+                    <StackPanel>
+                        <!-- Card Avatar + Tên -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="72" Height="72" CornerRadius="36" Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                        VerticalAlignment="Center">
+                                    <ui:SymbolIcon Symbol="Person24" FontSize="36" Foreground="White"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding User.DisplayName}" FontSize="22" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding User.Email}" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card thông tin chi tiết -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Thông tin tài khoản" Style="{StaticResource SectionTitleStyle}" />
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="12" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="12" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="12" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Username" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding User.UserName}" Style="{StaticResource FieldValueStyle}" />
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tên hiển thị" Style="{StaticResource FieldLabelStyle}" />
+                                    <ui:TextBox Grid.Row="2" Grid.Column="1" Text="{Binding User.DisplayName, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Email" Style="{StaticResource FieldLabelStyle}" />
+                                    <ui:TextBox Grid.Row="4" Grid.Column="1" Text="{Binding User.Email, UpdateSourceTrigger=PropertyChanged}" />
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Gói hiện tại" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding User.Plan}" Style="{StaticResource FieldValueStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card ID Ngẫu nhiên + Copy -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Mã chia sẻ của bạn" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock Text="Gửi mã này cho người khác để kết bạn hoặc nhận file."
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,12" TextWrapping="Wrap" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                                            CornerRadius="8" Padding="16,12">
+                                        <TextBlock Text="{Binding User.Id}" FontFamily="Consolas, Cascadia Code, monospace"
+                                                   FontSize="22" FontWeight="Bold"
+                                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}" />
+                                    </Border>
+                                    <ui:Button Grid.Column="1" Command="{Binding CopyIdCommand}" Margin="8,0,0,0"
+                                                Appearance="Primary" Height="46" Padding="16,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="Copy24" Margin="0,0,6,0" />
+                                            <TextBlock Text="Copy" FontWeight="SemiBold" />
+                                        </StackPanel>
+                                    </ui:Button>
+                                </Grid>
+
+                                <TextBlock Text="{Binding StatusMessage}" Margin="0,10,0,0"
+                                           Foreground="{Binding IsStatusError, Converter={StaticResource InverseBoolToVisibility}, ConverterParameter=Green}"
+                                           Visibility="{Binding HasStatus, Converter={StaticResource BoolToVisibility}}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card Đổi mật khẩu -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Đổi mật khẩu" Style="{StaticResource SectionTitleStyle}" />
+
+                                <TextBlock Text="Mật khẩu hiện tại" Style="{StaticResource FieldLabelStyle}" />
+                                <ui:PasswordBox Margin="0,0,0,12" Height="40"
+                                                helpers:PasswordBoxHelper.BoundPassword="{Binding OldPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Text="Mật khẩu mới" Style="{StaticResource FieldLabelStyle}" />
+                                <ui:PasswordBox Margin="0,0,0,12" Height="40"
+                                                helpers:PasswordBoxHelper.BoundPassword="{Binding NewPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <TextBlock Text="Nhập lại mật khẩu mới" Style="{StaticResource FieldLabelStyle}" />
+                                <ui:PasswordBox Margin="0,0,0,16" Height="40"
+                                                helpers:PasswordBoxHelper.BoundPassword="{Binding ConfirmNewPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <ui:Button Command="{Binding ChangePasswordCommand}" HorizontalAlignment="Right"
+                                            Appearance="Primary">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Visibility="{Binding IsChangingPassword, Converter={StaticResource InverseBoolToVisibility}}">
+                                            <ui:SymbolIcon Symbol="LockClosed24" Margin="0,0,6,0" />
+                                            <TextBlock Text="Cập nhật mật khẩu" FontWeight="SemiBold" />
+                                        </StackPanel>
+                                        <ui:ProgressRing IsIndeterminate="True" Width="20" Height="20"
+                                                         Visibility="{Binding IsChangingPassword, Converter={StaticResource BoolToVisibility}}" />
+                                    </Grid>
+                                </ui:Button>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </ui:TabViewItem>
+
+            <!-- ==================== TAB CÀI ĐẶT ==================== -->
+            <ui:TabViewItem Header="Cài đặt hệ thống">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4">
+                    <StackPanel>
+                        <!-- Theme Switcher -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Giao diện (Theme)" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock Text="WPF-UI sẽ tự động áp dụng chế độ Sáng/Tối ngay lập tức."
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,12" TextWrapping="Wrap" />
+
+                                <StackPanel>
+                                    <RadioButton GroupName="Theme" Content="Sáng (Light)" Margin="0,4"
+                                                 IsChecked="{Binding SelectedTheme, Mode=TwoWay, Converter={StaticResource StringEquals}, ConverterParameter=Light}" />
+                                    <RadioButton GroupName="Theme" Content="Tối (Dark)" Margin="0,4"
+                                                 IsChecked="{Binding SelectedTheme, Mode=TwoWay, Converter={StaticResource StringEquals}, ConverterParameter=Dark}" />
+                                    <RadioButton GroupName="Theme" Content="Theo hệ thống (System)" Margin="0,4"
+                                                 IsChecked="{Binding SelectedTheme, Mode=TwoWay, Converter={StaticResource StringEquals}, ConverterParameter=System}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Notifications -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Thông báo ứng dụng" FontWeight="SemiBold" />
+                                    <TextBlock Text="Nhận thông báo khi có file mới, OCR hoàn tất, hoặc tin nhắn."
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <ui:ToggleSwitch Grid.Column="1" IsChecked="{Binding NotificationsEnabled}" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Thông tin ứng dụng -->
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="Thông tin ứng dụng" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock Text="Trợ Lý Số Cá Nhân — Phiên bản 1.0.0" />
+                                <TextBlock Text="Build: 2026.06.04" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </ui:TabViewItem>
+        </ui:TabView>
+    </Grid>
+</ui:FluentWindow>

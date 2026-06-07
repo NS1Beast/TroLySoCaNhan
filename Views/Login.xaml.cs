@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using TroLySoCaNhan.ViewModels;
 using Wpf.Ui.Controls;
 
 namespace TroLySoCaNhan.Views
@@ -12,109 +11,90 @@ namespace TroLySoCaNhan.Views
         public Login()
         {
             InitializeComponent();
+
+            // Subscribe sự kiện đăng nhập thành công từ ViewModel
+            if (DataContext is LoginViewModel vm)
+            {
+                vm.LoginSucceeded += OnLoginSucceeded;
+                vm.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName == nameof(LoginViewModel.ActivePanel))
+                        SlideToPanel(vm.ActivePanel);
+                };
+            }
         }
 
+
+        private void txtPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is TroLySoCaNhan.ViewModels.LoginViewModel vm)
+            {
+                // Ép kiểu sender về dạng ui:PasswordBox của thư viện Wpf.Ui
+                if (sender is Wpf.Ui.Controls.PasswordBox passBox)
+                {
+                    vm.Password = passBox.Password;
+                }
+            }
+        }
+
+
         // ==========================================
-        // 1. HIỆU ỨNG PARALLAX (DI CHUỘT)
+        // 1. HIỆU ỨNG PARALLAX (DI CHUỘT) — chỉ là hiệu ứng thị giác, KHÔNG phải business logic
         // ==========================================
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
             Point mousePos = e.GetPosition(this);
             double centerX = this.ActualWidth / 2;
             double centerY = this.ActualHeight / 2;
-
             double offsetX = mousePos.X - centerX;
-
-            // Chữ (Branding) di chuyển ngược chiều chuột một chút
             transBranding.X = -offsetX * 0.015;
-
-            // Form đăng nhập di chuyển cùng chiều chuột
             transCard.X = offsetX * 0.01;
         }
 
         // ==========================================
-        // 2. HOẠT ẢNH CHUYỂN PANEL (SLIDE ANIMATION)
+        // 2. HOẠT ẢNH CHUYỂN PANEL — thuần túy UI animation, điều khiển bởi ViewModel
         // ==========================================
+        private void SlideToPanel(string panel)
+        {
+            switch (panel)
+            {
+                case "Login":
+                    SlidePanel(transLogin, 0);
+                    SlidePanel(transRegister, 420);
+                    SlidePanel(transForgot, 420);
+                    break;
+                case "Register":
+                    SlidePanel(transLogin, -450);
+                    SlidePanel(transRegister, 0);
+                    SlidePanel(transForgot, 420);
+                    break;
+                case "Forgot":
+                    SlidePanel(transLogin, -450);
+                    SlidePanel(transRegister, 420);
+                    SlidePanel(transForgot, 0);
+                    break;
+            }
+        }
+
         private void SlidePanel(System.Windows.Media.TranslateTransform target, double toValue)
         {
             DoubleAnimation anim = new DoubleAnimation()
             {
                 To = toValue,
                 Duration = TimeSpan.FromMilliseconds(350),
-                EasingFunction = new QuarticEase() { EasingMode = EasingMode.EaseOut } // Gia tốc mượt
+                EasingFunction = new QuarticEase() { EasingMode = EasingMode.EaseOut }
             };
             target.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, anim);
         }
 
-        private void LinkToRegister_Click(object sender, RoutedEventArgs e)
-        {
-            SlidePanel(transLogin, -450); // Đẩy Login sang trái cho khuất hẳn
-            SlidePanel(transRegister, 0); // Kéo Register vào giữa
-        }
-
-        private void LinkToLogin_Click(object sender, RoutedEventArgs e)
-        {
-            SlidePanel(transRegister, 450); // Đẩy Register về bên phải
-            SlidePanel(transLogin, 0);      // Kéo Login về giữa
-        }
-
-        private void LinkToForgotPassword_Click(object sender, RoutedEventArgs e)
-        {
-            SlidePanel(transLogin, -450); // Đẩy Login sang trái
-            SlidePanel(transForgot, 0);   // Kéo Forgot vào giữa
-        }
-
-        private void LinkToLoginFromForgot_Click(object sender, RoutedEventArgs e)
-        {
-            SlidePanel(transForgot, 450); // Đẩy Forgot về bên phải
-            SlidePanel(transLogin, 0);    // Kéo Login về giữa
-        }
-
         // ==========================================
-        // 3. XỬ LÝ NÚT BẤM (GIẢ LẬP LOADING)
+        // 3. CHUYỂN SANG DASHBOARD KHI LOGIN THÀNH CÔNG
         // ==========================================
-        private async void btnLogin_Click(object sender, RoutedEventArgs e)
+        private void OnLoginSucceeded(object? sender, System.EventArgs e)
         {
-            // Bật hiệu ứng Loading xoay xoay
-            txtLoginBtn.Visibility = Visibility.Collapsed;
-            ringLoading.Visibility = Visibility.Visible;
-            btnLogin.IsEnabled = false;
-
-            // TODO: Gọi API / Database hoặc SQL Server ở đây
-            await Task.Delay(1500); // Giả lập delay mạng
-
-            // Tắt hiệu ứng Loading
-            txtLoginBtn.Visibility = Visibility.Visible;
-            ringLoading.Visibility = Visibility.Collapsed;
-            btnLogin.IsEnabled = true;
-
-            // MessageBox.Show("Đăng nhập thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private async void btnRegister_Click(object sender, RoutedEventArgs e)
-        {
-            txtRegBtnContent.Visibility = Visibility.Collapsed;
-            ringRegLoading.Visibility = Visibility.Visible;
-            btnRegister.IsEnabled = false;
-
-            await Task.Delay(1500);
-
-            txtRegBtnContent.Visibility = Visibility.Visible;
-            ringRegLoading.Visibility = Visibility.Collapsed;
-            btnRegister.IsEnabled = true;
-        }
-
-        private async void btnForgotPassword_Click(object sender, RoutedEventArgs e)
-        {
-            txtForgotBtnContent.Visibility = Visibility.Collapsed;
-            ringForgotLoading.Visibility = Visibility.Visible;
-            btnForgotPassword.IsEnabled = false;
-
-            await Task.Delay(1500);
-
-            txtForgotBtnContent.Visibility = Visibility.Visible;
-            ringForgotLoading.Visibility = Visibility.Collapsed;
-            btnForgotPassword.IsEnabled = true;
+            var dashboard = new DashBoard();
+            dashboard.Show();
+            this.Close();
         }
     }
 }

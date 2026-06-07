@@ -1,6 +1,5 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
+using TroLySoCaNhan.Views;
 
 namespace TroLySoCaNhan
 {
@@ -9,6 +8,13 @@ namespace TroLySoCaNhan
     /// </summary>
     public partial class App : Application
     {
-    }
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
 
+            // Mở cửa sổ Login đầu tiên
+            var loginWindow = new Login();
+            loginWindow.Show();
+        }
+    }
 }

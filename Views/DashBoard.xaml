@@ -1,12 +1,188 @@
-﻿<Window x:Class="TroLySoCaNhan.Views.DashBoard"
+<ui:FluentWindow x:Class="TroLySoCaNhan.Views.DashBoard"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:local="clr-namespace:TroLySoCaNhan.Views"
+        xmlns:vm="clr-namespace:TroLySoCaNhan.ViewModels"
+        xmlns:models="clr-namespace:TroLySoCaNhan.Models"
         mc:Ignorable="d"
-        Title="DashBoard" Height="450" Width="800">
+        Title="Dashboard - Trợ lý số cá nhân"
+        Height="800" Width="1280"
+        WindowBackdropType="Mica"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterScreen">
+
+    <ui:FluentWindow.DataContext>
+        <vm:DashboardViewModel />
+    </ui:FluentWindow.DataContext>
+
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- TitleBar -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- TitleBar có nút mở Hồ sơ, Cài đặt, Nâng cấp -->
+        <ui:TitleBar Grid.Row="0" Title="Trợ Lý Số Cá Nhân">
+            <ui:TitleBar.Icon>
+                <ui:SymbolIcon Symbol="Bot24" />
+            </ui:TitleBar.Icon>
+            <ui:TitleBar.Header>
+                <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                    <ui:Button Command="{Binding OpenProfileCommand}" ToolTip="Hồ sơ"
+                               Background="Transparent" BorderBrush="Transparent" Padding="8">
+                        <ui:SymbolIcon Symbol="Person24" />
+                    </ui:Button>
+                    <ui:Button Command="{Binding OpenSettingsCommand}" ToolTip="Cài đặt"
+                               Background="Transparent" BorderBrush="Transparent" Padding="8">
+                        <ui:SymbolIcon Symbol="Settings24" />
+                    </ui:Button>
+                    <ui:Button Command="{Binding OpenUpgradeCommand}" ToolTip="Nâng cấp tài khoản"
+                               Background="Transparent" BorderBrush="Transparent" Padding="8">
+                        <ui:SymbolIcon Symbol="Star24" Foreground="#f59e0b" />
+                    </ui:Button>
+                </StackPanel>
+            </ui:TitleBar.Header>
+        </ui:TitleBar>
+
+        <Grid Grid.Row="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <!-- Thanh công cụ -->
+                <RowDefinition Height="Auto" />
+                <!-- Progress OCR -->
+                <RowDefinition Height="*" />
+                <!-- DataGrid -->
+                <RowDefinition Height="Auto" />
+                <!-- Phân trang -->
+            </Grid.RowDefinitions>
+
+            <!-- ==================== THANH CÔNG CỤ ==================== -->
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ui:TextBox Grid.Column="0" PlaceholderText="Tìm kiếm tài liệu..."
+                            Icon="{ui:SymbolIcon Search24}"
+                            Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,8,0" />
+                <ui:Button Grid.Column="1" Content="Tìm" Command="{Binding SearchCommand}" Margin="0,0,8,0" />
+                <ui:Button Grid.Column="2" Command="{Binding UploadTaiLieuCommand}" Appearance="Primary">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="ArrowUpload24" Margin="0,0,6,0" />
+                        <TextBlock Text="Upload" />
+                    </StackPanel>
+                </ui:Button>
+            </Grid>
+
+            <!-- ==================== THANH TIẾN TRÌNH OCR (Mặc định ẩn, hiện khi IsProcessingOcr) ==================== -->
+            <Border Grid.Row="1" Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                    CornerRadius="8" Padding="12,8" Margin="0,0,0,12"
+                    Visibility="{Binding IsProcessingOcr, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+                    <DockPanel>
+                        <TextBlock Text="Đang xử lý OCR..." FontWeight="SemiBold" DockPanel.Dock="Left" />
+                        <TextBlock Text="{Binding OcrStatusMessage}" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                    </DockPanel>
+                    <ProgressBar Value="{Binding TiLeHoanThanh, Mode=OneWay}" Minimum="0" Maximum="100" Height="8" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== OVERLAY LOADING (mờ nền khi đang gọi API) ==================== -->
+            <Grid Grid.Row="2">
+                <!-- DataGrid tài liệu với Row + Column Virtualization -->
+                <DataGrid ItemsSource="{Binding TaiLieus}"
+                          SelectedItem="{Binding SelectedTaiLieu}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          EnableRowVirtualization="True"
+                          EnableColumnVirtualization="True"
+                          VirtualizingPanel.IsVirtualizing="True"
+                          VirtualizingPanel.VirtualizationMode="Recycling"
+                          VirtualizingPanel.ScrollUnit="Pixel"
+                          ScrollViewer.CanContentScroll="True"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          RowHeight="42"
+                          AlternatingRowBackground="{DynamicResource ControlFillColorTransparentBrush}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Mã" Binding="{Binding Id}" Width="120" />
+                        <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding TenFile}" Width="*" />
+                        <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMuc}" Width="120" />
+                        <DataGridTextColumn Header="Dung lượng" Binding="{Binding DungLuongHienThi}" Width="100" />
+                        <DataGridTextColumn Header="Trạng thái" Binding="{Binding TrangThai}" Width="140" />
+                        <DataGridTextColumn Header="Ngày tạo" Binding="{Binding NgayTao, StringFormat='dd/MM/yyyy'}" Width="110" />
+                        <DataGridTextColumn Header="Người tạo" Binding="{Binding NguoiTao}" Width="140" />
+                        <DataGridTemplateColumn Header="Thao tác" Width="200">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <ui:Button ToolTip="Chạy OCR" Padding="6" Margin="2,0"
+                                                   Command="{Binding DataContext.StartOcrCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                   CommandParameter="{Binding}">
+                                            <ui:SymbolIcon Symbol="Scan24" FontSize="14" />
+                                        </ui:Button>
+                                        <ui:Button ToolTip="Xem" Padding="6" Margin="2,0">
+                                            <ui:SymbolIcon Symbol="Eye24" FontSize="14" />
+                                        </ui:Button>
+                                        <ui:Button ToolTip="Tải xuống" Padding="6" Margin="2,0">
+                                            <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="14" />
+                                        </ui:Button>
+                                        <ui:Button ToolTip="Xóa" Padding="6" Margin="2,0"
+                                                   Command="{Binding DataContext.DeleteTaiLieuCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                   CommandParameter="{Binding}">
+                                            <ui:SymbolIcon Symbol="Delete24" FontSize="14" Foreground="#ef4444" />
+                                        </ui:Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Overlay loading -->
+                <Border Background="#80000000" CornerRadius="6"
+                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ui:ProgressRing IsIndeterminate="True" Width="48" Height="48" Foreground="White" />
+                        <TextBlock Text="Đang tải dữ liệu..." Foreground="White" Margin="0,8,0,0" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ==================== PHÂN TRANG ==================== -->
+            <DockPanel Grid.Row="3" Margin="0,12,0,0">
+                <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                    <Run Text="Tổng: " />
+                    <Run Text="{Binding TotalItems, Mode=OneWay}" FontWeight="SemiBold" />
+                    <Run Text="  |  Trang " />
+                    <Run Text="{Binding CurrentPage, Mode=OneWay}" FontWeight="SemiBold" />
+                    <Run Text=" / " />
+                    <Run Text="{Binding TotalPages, Mode=OneWay}" FontWeight="SemiBold" />
+                </TextBlock>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <ui:Button Command="{Binding PrevPageCommand}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon Symbol="ChevronLeft24" Margin="0,0,4,0" FontSize="14" />
+                            <TextBlock Text="Trước" />
+                        </StackPanel>
+                    </ui:Button>
+                    <ui:Button Command="{Binding NextPageCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Sau" Margin="0,0,4,0" />
+                            <ui:SymbolIcon Symbol="ChevronRight24" FontSize="14" />
+                        </StackPanel>
+                    </ui:Button>
+                </StackPanel>
+            </DockPanel>
+        </Grid>
     </Grid>
-</Window>
+</ui:FluentWindow>

@@ -1,0 +1,140 @@
+<ui:FluentWindow x:Class="TroLySoCaNhan.Views.UpgradeDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:local="clr-namespace:TroLySoCaNhan.Views"
+        xmlns:vm="clr-namespace:TroLySoCaNhan.ViewModels"
+        mc:Ignorable="d"
+        Title="Nâng cấp tài khoản"
+        Height="640" Width="720"
+        WindowBackdropType="Mica"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <ui:FluentWindow.DataContext>
+        <vm:UpgradeViewModel />
+    </ui:FluentWindow.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="Nâng cấp lên Pro">
+            <ui:TitleBar.Icon>
+                <ui:SymbolIcon Symbol="Star24" Foreground="#f59e0b" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+
+        <Grid Grid.Row="1" Margin="20">
+            <!-- ==================== BƯỚC 1: CHỌN GÓI + PHƯƠNG THỨC ==================== -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          Visibility="{Binding ShowSelectPayment, Converter={StaticResource BoolToVisibility}}">
+                <StackPanel>
+                    <!-- Card thông tin gói -->
+                    <Border Background="{DynamicResource AccentFillColorDefaultBrush}" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="{Binding TenGoi}" Foreground="White" FontSize="22" FontWeight="Bold" />
+                            <TextBlock Text="{Binding GiaTien}" Foreground="White" FontSize="16" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Danh sách quyền lợi với ✔️ -->
+                    <Border Background="{DynamicResource ControlFillColorDefaultBrush}" BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                            BorderThickness="1" CornerRadius="12" Padding="20" Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="Quyền lợi gói Pro" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12" />
+                            <ItemsControl ItemsSource="{Binding QuyenLois}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="0,6">
+                                            <TextBlock Text="✔️" FontSize="16" Foreground="#10b981" FontWeight="Bold" Margin="0,0,10,0" />
+                                            <TextBlock Text="{Binding NoiDung}" FontSize="14" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Phương thức thanh toán -->
+                    <TextBlock Text="Chọn phương thức thanh toán" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <ItemsControl ItemsSource="{Binding PhuongThucs}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ui:Card Margin="0,4" Padding="14">
+                                    <ui:Card.Style>
+                                        <Style TargetType="ui:Card">
+                                            <Setter Property="Background" Value="{DynamicResource ControlFillColorDefaultBrush}" />
+                                        </Style>
+                                    </ui:Card.Style>
+                                    <Button Background="Transparent" BorderBrush="Transparent" BorderThickness="0"
+                                            HorizontalContentAlignment="Stretch" Cursor="Hand"
+                                            Command="{Binding DataContext.ChonPhuongThucCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="{Binding Icon.Symbol}" FontSize="20" Margin="0,0,10,0"
+                                                           Foreground="{Binding Color}" />
+                                            <TextBlock Text="{Binding Ten}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </ui:Card>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Nút hành động -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                        <ui:Button Content="Hủy" Command="{Binding HuyCommand}" Margin="0,0,8,0" />
+                        <ui:Button Appearance="Primary" Command="{Binding ThanhToanCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="Payment24" Margin="0,0,6,0" />
+                                <TextBlock Text="Thanh toán ngay" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </ui:Button>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- ==================== BƯỚC 2: QR / LOADING ==================== -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Visibility="{Binding ShowWaitingPayment, Converter={StaticResource BoolToVisibility}}">
+                <Border Width="220" Height="220" CornerRadius="12" Background="White" Padding="12" BorderBrush="#334155" BorderThickness="1">
+                    <!-- QR giả lập: vẽ bằng hình chữ nhật đen trắng để demo. Khi gọi API thật sẽ bind ảnh QR base64 -->
+                    <Grid>
+                        <Rectangle Fill="Black" Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                        <Rectangle Fill="Black" Width="40" Height="40" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                        <Rectangle Fill="Black" Width="40" Height="40" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                        <TextBlock Text="QR CODE" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#64748b" />
+                    </Grid>
+                </Border>
+                <StackPanel HorizontalAlignment="Center" Margin="0,16,0,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <ui:ProgressRing IsIndeterminate="True" Width="18" Height="18" />
+                        <TextBlock Text="Đang chờ xác nhận thanh toán..." Margin="8,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="Quét mã QR bằng ứng dụng ngân hàng/VNPay/Momo để hoàn tất."
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,8,0,0" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="320" />
+                </StackPanel>
+                <ui:Button Content="Hủy" Command="{Binding HuyCommand}" HorizontalAlignment="Center" Margin="0,20,0,0" />
+            </StackPanel>
+
+            <!-- ==================== BƯỚC 3: THÀNH CÔNG ==================== -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Visibility="{Binding ShowSuccess, Converter={StaticResource BoolToVisibility}}">
+                <Border Width="100" Height="100" CornerRadius="50" Background="#10b981">
+                    <ui:SymbolIcon Symbol="Checkmark24" FontSize="56" Foreground="White"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Text="Nâng cấp thành công!" FontSize="22" FontWeight="Bold" Margin="0,16,0,4" HorizontalAlignment="Center" />
+                <TextBlock Text="Cảm ơn bạn đã nâng cấp lên Pro. Quyền lợi đã được kích hoạt."
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="400" />
+                <ui:Button Content="Đóng" Command="{Binding DongCommand}" Appearance="Primary" Margin="0,20,0,0" Padding="32,8" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

@@ -1,25 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using TroLySoCaNhan.ViewModels;
+using Wpf.Ui.Controls;
 
 namespace TroLySoCaNhan.Views
 {
-    /// <summary>
-    /// Interaction logic for DashBoard.xaml
-    /// </summary>
-    public partial class DashBoard : Window
+    public partial class DashBoard : FluentWindow
     {
         public DashBoard()
         {
             InitializeComponent();
+
+            // Subscribe các yêu cầu mở Window mới
+            if (DataContext is DashboardViewModel vm)
+            {
+                vm.ProfileRequested += (_, _) =>
+                {
+                    var win = new ProfileWindow { Owner = this };
+                    win.ShowDialog();
+                };
+                vm.SettingsRequested += (_, _) =>
+                {
+                    var win = new ProfileWindow(vm.CurrentUser) { Owner = this };
+                    win.ShowDialog();
+                };
+                vm.UpgradeRequested += (_, _) =>
+                {
+                    var dlg = new UpgradeDialog { Owner = this };
+                    dlg.ShowDialog();
+                };
+            }
         }
     }
 }
