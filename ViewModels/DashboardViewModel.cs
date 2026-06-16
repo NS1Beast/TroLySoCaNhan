@@ -1,31 +1,28 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using TroLySoCaNhan.Models;
 using TroLySoCaNhan.MVVM;
+// Bỏ using TroLySoCaNhan.Models; đi để không bị nhầm lẫn với Database
 
 namespace TroLySoCaNhan.ViewModels
 {
-    /// <summary>
-    /// ViewModel cho màn hình Dashboard.
-    /// Quản lý danh sách tài liệu, trạng thái loading, tiến trình OCR, tìm kiếm, phân trang.
-    /// </summary>
     public class DashboardViewModel : ViewModelBase
     {
         // ==========================================
         // DỮ LIỆU
         // ==========================================
-        public User CurrentUser { get; } = new User
+        // Sử dụng DTO thay vì Model Database
+        public UserDto CurrentUser { get; } = new UserDto
         {
             Id = "TL-7F2A-9C81",
             UserName = "nguyenvana",
             DisplayName = "Nguyễn Văn A",
             Email = "vana@example.com",
-            AvatarUrl = "",
             Plan = "Miễn phí"
         };
 
-        public ObservableCollection<TaiLieu> TaiLieus { get; } = new ObservableCollection<TaiLieu>();
+        // Danh sách hiển thị trên UI dùng class TaiLieuItem
+        public ObservableCollection<TaiLieuItem> TaiLieus { get; } = new ObservableCollection<TaiLieuItem>();
 
         // ==========================================
         // TÌM KIẾM / LỌC / PHÂN TRANG
@@ -104,7 +101,6 @@ namespace TroLySoCaNhan.ViewModels
         }
 
         private double _tiLeHoanThanh;
-        /// <summary>Tiến trình OCR (0-100). Bind vào ProgressBar Value.</summary>
         public double TiLeHoanThanh
         {
             get => _tiLeHoanThanh;
@@ -118,8 +114,8 @@ namespace TroLySoCaNhan.ViewModels
             set => SetProperty(ref _ocrStatusMessage, value);
         }
 
-        private TaiLieu? _selectedTaiLieu;
-        public TaiLieu? SelectedTaiLieu
+        private TaiLieuItem? _selectedTaiLieu;
+        public TaiLieuItem? SelectedTaiLieu
         {
             get => _selectedTaiLieu;
             set => SetProperty(ref _selectedTaiLieu, value);
@@ -136,6 +132,7 @@ namespace TroLySoCaNhan.ViewModels
         public RelayCommand OpenProfileCommand { get; }
         public RelayCommand OpenSettingsCommand { get; }
         public RelayCommand OpenUpgradeCommand { get; }
+        public RelayCommand OpenGroupCommand { get; }
         public RelayCommand DeleteTaiLieuCommand { get; }
         public RelayCommand UploadTaiLieuCommand { get; }
 
@@ -149,16 +146,18 @@ namespace TroLySoCaNhan.ViewModels
             OpenProfileCommand = new RelayCommand(_ => ProfileRequested?.Invoke(this, EventArgs.Empty));
             OpenSettingsCommand = new RelayCommand(_ => SettingsRequested?.Invoke(this, EventArgs.Empty));
             OpenUpgradeCommand = new RelayCommand(_ => UpgradeRequested?.Invoke(this, EventArgs.Empty));
-            DeleteTaiLieuCommand = new RelayCommand(t => { if (t is TaiLieu tl) TaiLieus.Remove(tl); });
+            DeleteTaiLieuCommand = new RelayCommand(t => { if (t is TaiLieuItem tl) TaiLieus.Remove(tl); });
             UploadTaiLieuCommand = new RelayCommand(async _ => await SimulateUploadAsync(), _ => !IsLoading);
+            OpenGroupCommand = new RelayCommand(_ => GroupRequested?.Invoke(this, EventArgs.Empty));
         }
 
         // ==========================================
-        // EVENTS — code-behind Dashboard sẽ subscribe để mở Window mới
+        // EVENTS
         // ==========================================
         public event EventHandler? ProfileRequested;
         public event EventHandler? SettingsRequested;
         public event EventHandler? UpgradeRequested;
+        public event EventHandler? GroupRequested;
 
         // ==========================================
         // HANDLERS
@@ -168,15 +167,12 @@ namespace TroLySoCaNhan.ViewModels
             IsLoading = true;
             try
             {
-                // TODO: gọi API phân trang thật ở đây
                 await Task.Delay(500);
-
-                // Giả lập dữ liệu
                 TaiLieus.Clear();
                 var seed = (CurrentPage - 1) * PageSize + 1;
                 for (int i = 0; i < 12; i++)
                 {
-                    TaiLieus.Add(new TaiLieu
+                    TaiLieus.Add(new TaiLieuItem
                     {
                         Id = $"DOC-{seed + i:00000}",
                         TenFile = $"Báo cáo tài chính Q{(seed + i) % 4 + 1}.pdf",
@@ -197,7 +193,6 @@ namespace TroLySoCaNhan.ViewModels
             }
         }
 
-        /// <summary>Mô phỏng OCR: bind TiLeHoanThanh + ProgressRing hiển thị.</summary>
         private async Task SimulateOcrAsync()
         {
             if (SelectedTaiLieu is null) return;
@@ -220,14 +215,13 @@ namespace TroLySoCaNhan.ViewModels
             }
         }
 
-        /// <summary>Mô phỏng upload file (kèm IsLoading).</summary>
         private async Task SimulateUploadAsync()
         {
             IsLoading = true;
             try
             {
                 await Task.Delay(1200);
-                TaiLieus.Insert(0, new TaiLieu
+                TaiLieus.Insert(0, new TaiLieuItem
                 {
                     Id = $"DOC-{DateTime.Now:HHmmss}",
                     TenFile = "Tài liệu mới upload.pdf",
@@ -242,6 +236,48 @@ namespace TroLySoCaNhan.ViewModels
             finally
             {
                 IsLoading = false;
+            }
+        }
+    }
+
+    // =======================================================
+    // CÁC LỚP DATA TRANSFER OBJECT (DTO) PHỤC VỤ RIÊNG CHO UI
+    // =======================================================
+
+    public class UserDto
+    {
+        public string Id { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Plan { get; set; } = string.Empty;
+    }
+
+    public class TaiLieuItem : ViewModelBase
+    {
+        public string Id { get; set; } = string.Empty;
+        public string TenFile { get; set; } = string.Empty;
+        public string DinhDang { get; set; } = string.Empty;
+        public long DungLuong { get; set; }
+        public string DanhMuc { get; set; } = string.Empty;
+
+        private string _trangThai = string.Empty;
+        public string TrangThai
+        {
+            get => _trangThai;
+            set => SetProperty(ref _trangThai, value);
+        }
+
+        public DateTime NgayTao { get; set; }
+        public string NguoiTao { get; set; } = string.Empty;
+
+        // Tự động tính toán dung lượng cho UI hiển thị đẹp mắt
+        public string DungLuongHienThi
+        {
+            get
+            {
+                if (DungLuong >= 1048576) return $"{(DungLuong / 1048576.0):0.##} MB";
+                return $"{(DungLuong / 1024.0):0} KB";
             }
         }
     }

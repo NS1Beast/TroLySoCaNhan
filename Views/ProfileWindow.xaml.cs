@@ -7,10 +7,26 @@ namespace TroLySoCaNhan.Views
 {
     public partial class ProfileWindow : FluentWindow
     {
-        public ProfileWindow() : this(new User { Id = "TL-GUEST", UserName = "guest", DisplayName = "Khách", Email = "", Plan = "Miễn phí" })
+        // Constructor rỗng để tránh lỗi:
+        // 'ProfileWindow' does not contain a constructor that takes 0 arguments
+        public ProfileWindow()
+        {
+            InitializeComponent();
+        }
+
+        // Nhận UserDto từ DashboardViewModel rồi chuyển sang Models.User
+        public ProfileWindow(UserDto currentUser) : this(new User
+        {
+            Id = currentUser.Id,
+            UserName = currentUser.UserName,
+            DisplayName = currentUser.DisplayName,
+            Email = currentUser.Email,
+            Plan = currentUser.Plan
+        })
         {
         }
 
+        // Constructor chính dùng Models.User
         public ProfileWindow(User user)
         {
             InitializeComponent();

@@ -1,43 +1,55 @@
-using TroLySoCaNhan.MVVM;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-namespace TroLySoCaNhan.Models
+namespace TroLySoCaNhan.Models;
+
+[Table("TaiLieu")]
+[Index("MaChuSoHuu", "MaNhomLuuTru", "DaXoa", "NgayTao", Name = "IDX_TaiLieu_CaNhan_Pagination", IsDescending = new[] { false, false, false, true })]
+[Index("MaNhomLuuTru", "DaXoa", "NgayTao", Name = "IDX_TaiLieu_Nhom_Pagination", IsDescending = new[] { false, false, true })]
+public partial class TaiLieu
 {
-    /// <summary>
-    /// Model Tài liệu — bind cho DataGrid danh sách file.
-    /// </summary>
-    public class TaiLieu : ViewModelBase
-    {
-        private string _id = string.Empty;
-        private string _tenFile = string.Empty;
-        private string _dinhDang = "pdf";
-        private long _dungLuong;
-        private string _danhMuc = string.Empty;
-        private string _trangThai = "Đã sẵn sàng";
-        private System.DateTime _ngayTao = System.DateTime.Now;
-        private string _nguoiTao = string.Empty;
+    [Key]
+    [Column("ID")]
+    public Guid Id { get; set; }
 
-        public string Id { get => _id; set => SetProperty(ref _id, value); }
-        public string TenFile { get => _tenFile; set => SetProperty(ref _tenFile, value); }
-        public string DinhDang { get => _dinhDang; set => SetProperty(ref _dinhDang, value); }
-        public long DungLuong { get => _dungLuong; set => SetProperty(ref _dungLuong, value); }
-        public string DanhMuc { get => _danhMuc; set => SetProperty(ref _danhMuc, value); }
-        public string TrangThai { get => _trangThai; set => SetProperty(ref _trangThai, value); }
-        public System.DateTime NgayTao { get => _ngayTao; set => SetProperty(ref _ngayTao, value); }
-        public string NguoiTao { get => _nguoiTao; set => SetProperty(ref _nguoiTao, value); }
+    [StringLength(255)]
+    public string TenTaiLieu { get; set; } = null!;
 
-        /// <summary>Hiển thị dung lượng dạng KB/MB/GB.</summary>
-        public string DungLuongHienThi
-        {
-            get
-            {
-                if (_dungLuong >= 1_073_741_824L)
-                    return $"{_dungLuong / 1_073_741_824.0:0.##} GB";
-                if (_dungLuong >= 1_048_576L)
-                    return $"{_dungLuong / 1_048_576.0:0.##} MB";
-                if (_dungLuong >= 1024L)
-                    return $"{_dungLuong / 1024.0:0.##} KB";
-                return $"{_dungLuong} B";
-            }
-        }
-    }
+    public Guid MaChuSoHuu { get; set; }
+
+    public Guid? MaNhomLuuTru { get; set; }
+
+    public bool? DaXoa { get; set; }
+
+    public DateTime? NgayTao { get; set; }
+
+    [InverseProperty("MaTaiLieuNavigation")]
+    public virtual ICollection<ChiaSeTaiLieuCaNhan> ChiaSeTaiLieuCaNhans { get; set; } = new List<ChiaSeTaiLieuCaNhan>();
+
+    [ForeignKey("MaChuSoHuu")]
+    [InverseProperty("TaiLieus")]
+    public virtual NguoiDung MaChuSoHuuNavigation { get; set; } = null!;
+
+    [ForeignKey("MaNhomLuuTru")]
+    [InverseProperty("TaiLieus")]
+    public virtual NhomLuuTru? MaNhomLuuTruNavigation { get; set; }
+
+    [InverseProperty("MaTaiLieuNavigation")]
+    public virtual ICollection<NhatKyTaiLieu> NhatKyTaiLieus { get; set; } = new List<NhatKyTaiLieu>();
+
+    [InverseProperty("MaTaiLieuNavigation")]
+    public virtual ICollection<PhienBanTaiLieu> PhienBanTaiLieus { get; set; } = new List<PhienBanTaiLieu>();
+
+    [InverseProperty("MaTaiLieuGocNavigation")]
+    public virtual ICollection<TacVuNenChiTiet> TacVuNenChiTietMaTaiLieuGocNavigations { get; set; } = new List<TacVuNenChiTiet>();
+
+    [InverseProperty("MaTaiLieuKetQuaNavigation")]
+    public virtual ICollection<TacVuNenChiTiet> TacVuNenChiTietMaTaiLieuKetQuaNavigations { get; set; } = new List<TacVuNenChiTiet>();
+
+    [ForeignKey("MaTaiLieu")]
+    [InverseProperty("MaTaiLieus")]
+    public virtual ICollection<DanhMuc> MaDanhMucs { get; set; } = new List<DanhMuc>();
 }

@@ -411,6 +411,21 @@
                         </Button>
 
                         <Button Style="{StaticResource TopNavButtonStyle}"
+        Command="{Binding OpenGroupCommand}"
+        ToolTip="Nhóm"
+        Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="People24"
+                       Foreground="#2563EB"
+                       FontSize="18"
+                       Margin="0,0,6,0"/>
+                                <TextBlock Text="Nhóm"
+                   Foreground="#0F172A"
+                   VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource TopNavButtonStyle}"
                                 Command="{Binding OpenSettingsCommand}"
                                 ToolTip="Cài đặt"
                                 Margin="0,0,8,0">

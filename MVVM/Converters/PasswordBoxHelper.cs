@@ -1,14 +1,8 @@
 using System.Windows;
-using System.Windows.Controls;
+using Wpf.Ui.Controls;
 
 namespace TroLySoCaNhan.MVVM.Converters
 {
-    /// <summary>
-    /// Cho phép bind PasswordBox.Password hai chiều mà KHÔNG vi phạm MVVM.
-    /// Cách dùng:
-    ///   &lt;ui:PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding Password}" /&gt;
-    ///   &lt;ui:PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" /&gt;
-    /// </summary>
     public static class PasswordBoxHelper
     {
         public static readonly DependencyProperty BoundPasswordProperty =
@@ -16,17 +10,94 @@ namespace TroLySoCaNhan.MVVM.Converters
                 "BoundPassword",
                 typeof(string),
                 typeof(PasswordBoxHelper),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnBoundPasswordChanged));
+                new PropertyMetadata(string.Empty, OnBoundPasswordChanged));
 
-        public static string GetBoundPassword(DependencyObject d) => (string)d.GetValue(BoundPasswordProperty);
-        public static void SetBoundPassword(DependencyObject d, string value) => d.SetValue(BoundPasswordProperty, value);
+        public static readonly DependencyProperty BindPasswordProperty =
+            DependencyProperty.RegisterAttached(
+                "BindPassword",
+                typeof(bool),
+                typeof(PasswordBoxHelper),
+                new PropertyMetadata(false, OnBindPasswordChanged));
 
-        private static void OnBoundPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static readonly DependencyProperty UpdatingPasswordProperty =
+            DependencyProperty.RegisterAttached(
+                "UpdatingPassword",
+                typeof(bool),
+                typeof(PasswordBoxHelper),
+                new PropertyMetadata(false));
+
+        public static string GetBoundPassword(DependencyObject dp)
         {
-            if (d is not PasswordBox pb) return;
-            // Tránh vòng lặp khi gán từ UI
-            if (pb.Password == (e.NewValue as string)) return;
-            pb.Password = e.NewValue as string ?? string.Empty;
+            return (string)dp.GetValue(BoundPasswordProperty);
+        }
+
+        public static void SetBoundPassword(DependencyObject dp, string value)
+        {
+            dp.SetValue(BoundPasswordProperty, value);
+        }
+
+        public static bool GetBindPassword(DependencyObject dp)
+        {
+            return (bool)dp.GetValue(BindPasswordProperty);
+        }
+
+        public static void SetBindPassword(DependencyObject dp, bool value)
+        {
+            dp.SetValue(BindPasswordProperty, value);
+        }
+
+        private static bool GetUpdatingPassword(DependencyObject dp)
+        {
+            return (bool)dp.GetValue(UpdatingPasswordProperty);
+        }
+
+        private static void SetUpdatingPassword(DependencyObject dp, bool value)
+        {
+            dp.SetValue(UpdatingPasswordProperty, value);
+        }
+
+        private static void OnBoundPasswordChanged(
+            DependencyObject dp,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if (dp is not PasswordBox passwordBox)
+                return;
+
+            passwordBox.PasswordChanged -= HandlePasswordChanged;
+
+            if (!GetUpdatingPassword(passwordBox))
+            {
+                passwordBox.Password = e.NewValue?.ToString() ?? string.Empty;
+            }
+
+            passwordBox.PasswordChanged += HandlePasswordChanged;
+        }
+
+        private static void OnBindPasswordChanged(
+            DependencyObject dp,
+            DependencyPropertyChangedEventArgs e)
+        {
+            if (dp is not PasswordBox passwordBox)
+                return;
+
+            bool wasBound = (bool)e.OldValue;
+            bool needToBind = (bool)e.NewValue;
+
+            if (wasBound)
+                passwordBox.PasswordChanged -= HandlePasswordChanged;
+
+            if (needToBind)
+                passwordBox.PasswordChanged += HandlePasswordChanged;
+        }
+
+        private static void HandlePasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is not PasswordBox passwordBox)
+                return;
+
+            SetUpdatingPassword(passwordBox, true);
+            SetBoundPassword(passwordBox, passwordBox.Password);
+            SetUpdatingPassword(passwordBox, false);
         }
     }
 }
