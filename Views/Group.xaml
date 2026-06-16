@@ -4,9 +4,8 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-                 xmlns:local="clr-namespace:TroLySoCaNhan.Views"
                  mc:Ignorable="d"
-                 Title="Nhóm lưu trữ"
+                 Title="Quản lý nhóm"
                  Height="780"
                  Width="1180"
                  MinHeight="720"
@@ -106,7 +105,7 @@
         </Style>
 
         <!-- =========================
-             BUTTON BO TRÒN
+             BUTTON STYLE
         ========================== -->
         <Style x:Key="PrimaryButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Height" Value="44"/>
@@ -322,7 +321,7 @@
                  TITLE BAR
             ========================== -->
             <ui:TitleBar Grid.Row="0"
-                         Title="Không gian nhóm"
+                         Title="Quản lý nhóm"
                          Foreground="#0F172A"
                          Background="Transparent">
                 <ui:TitleBar.Icon>
@@ -347,10 +346,10 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel>
-                        <TextBlock Text="Nhóm lưu trữ"
+                        <TextBlock Text="Quản lý nhóm"
                                    Style="{StaticResource PageTitleStyle}"/>
 
-                        <TextBlock Text="Quản lý không gian làm việc chung, tài liệu nội bộ, thành viên và quyền truy cập theo nhóm."
+                        <TextBlock Text="Tạo nhóm lưu trữ, mời thành viên, phân quyền truy cập và theo dõi hoạt động nhóm."
                                    Style="{StaticResource PageSubTitleStyle}"
                                    Margin="0,6,0,0"/>
                     </StackPanel>
@@ -359,8 +358,8 @@
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center">
 
-                        <Button Style="{StaticResource SecondaryButtonStyle}"
-                                Command="{Binding RefreshGroupsCommand}"
+                        <Button x:Name="BtnRefreshGroups"
+                                Style="{StaticResource SecondaryButtonStyle}"
                                 Margin="0,0,10,0">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Symbol="ArrowClockwise24"
@@ -372,8 +371,8 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Style="{StaticResource PrimaryButtonStyle}"
-                                Command="{Binding CreateGroupCommand}">
+                        <Button x:Name="BtnCreateGroup"
+                                Style="{StaticResource PrimaryButtonStyle}">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Symbol="Add24"
                                                Foreground="White"
@@ -391,11 +390,11 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="300"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="320"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- =========================
-                         SIDEBAR GROUPS
+                         SIDEBAR: DANH SÁCH NHÓM
                     ========================== -->
                     <Border Grid.Column="0"
                             Style="{StaticResource GlassCardStyle}"
@@ -409,10 +408,10 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Margin="0,0,0,14">
-                                <TextBlock Text="Danh sách nhóm"
+                                <TextBlock Text="Nhóm của tôi"
                                            Style="{StaticResource SectionTitleStyle}"/>
 
-                                <TextBlock Text="Chọn một nhóm để xem tài liệu và thành viên."
+                                <TextBlock Text="Chọn nhóm để quản lý thành viên và quyền truy cập."
                                            Style="{StaticResource MutedTextStyle}"
                                            Margin="0,4,0,0"/>
                             </StackPanel>
@@ -420,78 +419,180 @@
                             <Border Grid.Row="1"
                                     Style="{StaticResource SearchBorderStyle}"
                                     Margin="0,0,0,14">
-                                <ui:TextBox PlaceholderText="Tìm nhóm..."
+                                <ui:TextBox x:Name="TxtSearchGroup"
+                                            PlaceholderText="Tìm nhóm..."
                                             Icon="{ui:SymbolIcon Search24}"
-                                            Style="{StaticResource SearchTextBoxStyle}"
-                                            Text="{Binding SearchGroupKeyword, UpdateSourceTrigger=PropertyChanged}"/>
+                                            Style="{StaticResource SearchTextBoxStyle}"/>
                             </Border>
 
-                            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding Groups}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Button Background="Transparent"
-                                                    BorderBrush="Transparent"
-                                                    BorderThickness="0"
-                                                    Padding="0"
-                                                    HorizontalContentAlignment="Stretch"
-                                                    Cursor="Hand"
-                                                    Command="{Binding DataContext.SelectGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}">
+                            <ScrollViewer Grid.Row="2"
+                                          VerticalScrollBarVisibility="Auto">
+                                <StackPanel>
 
-                                                <Border CornerRadius="20"
+                                    <!-- Demo item 1 -->
+                                    <Button Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0"
+                                            Padding="0"
+                                            HorizontalContentAlignment="Stretch"
+                                            Cursor="Hand"
+                                            Margin="0,0,0,10">
+
+                                        <Border CornerRadius="20"
+                                                Background="#EFF6FF"
+                                                BorderBrush="#BFDBFE"
+                                                BorderThickness="1"
+                                                Padding="14">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Width="46"
+                                                        Height="46"
+                                                        CornerRadius="16"
                                                         Background="#FFFFFF"
-                                                        BorderBrush="#D8E6FF"
-                                                        BorderThickness="1"
-                                                        Padding="14"
-                                                        Margin="0,0,0,10">
-
-                                                    <Grid>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto"/>
-                                                            <ColumnDefinition Width="*"/>
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <Border Width="46"
-                                                                Height="46"
-                                                                CornerRadius="16"
-                                                                Background="#EFF6FF"
-                                                                Margin="0,0,12,0">
-                                                            <ui:SymbolIcon Symbol="PeopleTeam24"
-                                                                           Foreground="#2563EB"
-                                                                           FontSize="24"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"/>
-                                                        </Border>
-
-                                                        <StackPanel Grid.Column="1">
-                                                            <TextBlock Text="{Binding TenNhom}"
-                                                                       Foreground="#0F172A"
-                                                                       FontSize="15"
-                                                                       FontWeight="Bold"
-                                                                       TextWrapping="Wrap"/>
-
-                                                            <TextBlock Foreground="#64748B"
-                                                                       FontSize="12"
-                                                                       Margin="0,4,0,0">
-                                                                <Run Text="{Binding SoThanhVien}"/>
-                                                                <Run Text=" thành viên • "/>
-                                                                <Run Text="{Binding SoTaiLieu}"/>
-                                                                <Run Text=" tài liệu"/>
-                                                            </TextBlock>
-                                                        </StackPanel>
-                                                    </Grid>
+                                                        Margin="0,0,12,0">
+                                                    <ui:SymbolIcon Symbol="PeopleTeam24"
+                                                                   Foreground="#2563EB"
+                                                                   FontSize="24"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"/>
                                                 </Border>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="Nhóm đồ án"
+                                                               Foreground="#0F172A"
+                                                               FontSize="15"
+                                                               FontWeight="Bold"/>
+
+                                                    <TextBlock Text="5 thành viên • Manager"
+                                                               Foreground="#64748B"
+                                                               FontSize="12"
+                                                               Margin="0,4,0,0"/>
+
+                                                    <TextBlock Text="Quyền: Toàn quyền"
+                                                               Foreground="#2563EB"
+                                                               FontSize="12"
+                                                               FontWeight="SemiBold"
+                                                               Margin="0,4,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </Button>
+
+                                    <!-- Demo item 2 -->
+                                    <Button Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0"
+                                            Padding="0"
+                                            HorizontalContentAlignment="Stretch"
+                                            Cursor="Hand"
+                                            Margin="0,0,0,10">
+
+                                        <Border CornerRadius="20"
+                                                Background="#FFFFFF"
+                                                BorderBrush="#D8E6FF"
+                                                BorderThickness="1"
+                                                Padding="14">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Width="46"
+                                                        Height="46"
+                                                        CornerRadius="16"
+                                                        Background="#F8FAFC"
+                                                        Margin="0,0,12,0">
+                                                    <ui:SymbolIcon Symbol="PeopleTeam24"
+                                                                   Foreground="#64748B"
+                                                                   FontSize="24"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"/>
+                                                </Border>
+
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="Phòng Marketing"
+                                                               Foreground="#0F172A"
+                                                               FontSize="15"
+                                                               FontWeight="Bold"/>
+
+                                                    <TextBlock Text="12 thành viên • Member"
+                                                               Foreground="#64748B"
+                                                               FontSize="12"
+                                                               Margin="0,4,0,0"/>
+
+                                                    <TextBlock Text="Quyền: Xem, Thêm"
+                                                               Foreground="#64748B"
+                                                               FontSize="12"
+                                                               Margin="0,4,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </Button>
+
+                                    <!-- Demo item 3 -->
+                                    <Button Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0"
+                                            Padding="0"
+                                            HorizontalContentAlignment="Stretch"
+                                            Cursor="Hand">
+
+                                        <Border CornerRadius="20"
+                                                Background="#FFFFFF"
+                                                BorderBrush="#D8E6FF"
+                                                BorderThickness="1"
+                                                Padding="14">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Width="46"
+                                                        Height="46"
+                                                        CornerRadius="16"
+                                                        Background="#F8FAFC"
+                                                        Margin="0,0,12,0">
+                                                    <ui:SymbolIcon Symbol="PeopleTeam24"
+                                                                   Foreground="#64748B"
+                                                                   FontSize="24"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"/>
+                                                </Border>
+
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="Tài liệu cá nhân chia sẻ"
+                                                               Foreground="#0F172A"
+                                                               FontSize="15"
+                                                               FontWeight="Bold"
+                                                               TextWrapping="Wrap"/>
+
+                                                    <TextBlock Text="3 thành viên • Owner"
+                                                               Foreground="#64748B"
+                                                               FontSize="12"
+                                                               Margin="0,4,0,0"/>
+
+                                                    <TextBlock Text="Quyền: Toàn quyền"
+                                                               Foreground="#64748B"
+                                                               FontSize="12"
+                                                               Margin="0,4,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </Button>
+
+                                </StackPanel>
                             </ScrollViewer>
                         </Grid>
                     </Border>
 
                     <!-- =========================
-                         CENTER DOCUMENTS
+                         CENTER: THÔNG TIN NHÓM + THÀNH VIÊN
                     ========================== -->
                     <Border Grid.Column="1"
                             Style="{StaticResource GlassCardStyle}"
@@ -505,146 +606,154 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <!-- Selected group header -->
-                            <Grid Grid.Row="0" Margin="0,0,0,16">
+                            <!-- GROUP INFO -->
+                            <Border Grid.Row="0"
+                                    CornerRadius="22"
+                                    Background="#FFFFFF"
+                                    BorderBrush="#D8E6FF"
+                                    BorderThickness="1"
+                                    Padding="18"
+                                    Margin="0,0,0,16">
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Width="62"
+                                            Height="62"
+                                            CornerRadius="22"
+                                            Background="#EFF6FF"
+                                            Margin="0,0,16,0">
+                                        <ui:SymbolIcon Symbol="PeopleTeam24"
+                                                       Foreground="#2563EB"
+                                                       FontSize="32"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="Nhóm đồ án"
+                                                   Foreground="#0F172A"
+                                                   FontSize="23"
+                                                   FontWeight="Bold"/>
+
+                                        <TextBlock Text="Không gian làm việc chung cho nhóm phát triển ứng dụng Trợ lý số cá nhân."
+                                                   Foreground="#64748B"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap"
+                                                   Margin="0,5,0,0"/>
+
+                                        <WrapPanel Margin="0,10,0,0">
+                                            <Border CornerRadius="14"
+                                                    Background="#EFF6FF"
+                                                    Padding="10,5"
+                                                    Margin="0,0,8,0">
+                                                <TextBlock Text="Vai trò: Owner"
+                                                           Foreground="#1E3A8A"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+
+                                            <Border CornerRadius="14"
+                                                    Background="#ECFDF5"
+                                                    Padding="10,5"
+                                                    Margin="0,0,8,0">
+                                                <TextBlock Text="5 thành viên"
+                                                           Foreground="#047857"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+
+                                            <Border CornerRadius="14"
+                                                    Background="#FEF3C7"
+                                                    Padding="10,5">
+                                                <TextBlock Text="Quyền hạn: 63"
+                                                           Foreground="#92400E"
+                                                           FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                            </Border>
+                                        </WrapPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2"
+                                                VerticalAlignment="Center">
+
+                                        <Button x:Name="BtnOpenGroupStorage"
+                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                Margin="0,0,0,10">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="Folder24"
+                                                               Foreground="White"
+                                                               FontSize="18"
+                                                               Margin="0,0,7,0"/>
+                                                <TextBlock Text="Mở kho nhóm"
+                                                           Foreground="White"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button x:Name="BtnEditGroup"
+                                                Style="{StaticResource SecondaryButtonStyle}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="Edit24"
+                                                               Foreground="#2563EB"
+                                                               FontSize="18"
+                                                               Margin="0,0,7,0"/>
+                                                <TextBlock Text="Sửa nhóm"
+                                                           Foreground="#0F172A"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- MEMBER TOOLBAR -->
+                            <Grid Grid.Row="1" Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border Width="50"
-                                                Height="50"
-                                                CornerRadius="18"
-                                                Background="#EFF6FF"
-                                                Margin="0,0,12,0">
-                                            <ui:SymbolIcon Symbol="Folder24"
-                                                           Foreground="#2563EB"
-                                                           FontSize="26"
-                                                           HorizontalAlignment="Center"
-                                                           VerticalAlignment="Center"/>
-                                        </Border>
+                                    <TextBlock Text="Thành viên trong nhóm"
+                                               Style="{StaticResource SectionTitleStyle}"/>
 
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding SelectedGroup.TenNhom, FallbackValue='Chưa chọn nhóm'}"
-                                                       Foreground="#0F172A"
-                                                       FontSize="22"
-                                                       FontWeight="Bold"/>
-
-                                            <TextBlock Text="Không gian lưu trữ chung cho tài liệu nhóm"
-                                                       Foreground="#64748B"
-                                                       FontSize="13"
-                                                       Margin="0,4,0,0"/>
-                                        </StackPanel>
-                                    </StackPanel>
+                                    <TextBlock Text="Quản lý thành viên, vai trò và quyền truy cập vào không gian nhóm."
+                                               Style="{StaticResource MutedTextStyle}"
+                                               Margin="0,4,0,0"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
 
-                                    <Button Style="{StaticResource SecondaryButtonStyle}"
-                                            Command="{Binding ShareGroupDocumentCommand}"
+                                    <Border Style="{StaticResource SearchBorderStyle}"
+                                            Width="260"
                                             Margin="0,0,10,0">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="Share24"
-                                                           Foreground="#2563EB"
-                                                           FontSize="18"
-                                                           Margin="0,0,7,0"/>
-                                            <TextBlock Text="Chia sẻ"
-                                                       Foreground="#0F172A"/>
-                                        </StackPanel>
-                                    </Button>
+                                        <ui:TextBox x:Name="TxtSearchMember"
+                                                    PlaceholderText="Tìm thành viên..."
+                                                    Icon="{ui:SymbolIcon Search24}"
+                                                    Style="{StaticResource SearchTextBoxStyle}"/>
+                                    </Border>
 
-                                    <Button Style="{StaticResource PrimaryButtonStyle}"
-                                            Command="{Binding UploadGroupDocumentCommand}">
+                                    <Button x:Name="BtnAddMember"
+                                            Style="{StaticResource PrimaryButtonStyle}">
                                         <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="ArrowUpload24"
+                                            <ui:SymbolIcon Symbol="PersonAdd24"
                                                            Foreground="White"
                                                            FontSize="18"
                                                            Margin="0,0,7,0"/>
-                                            <TextBlock Text="Upload"
+                                            <TextBlock Text="Thêm thành viên"
                                                        Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
                             </Grid>
 
-                            <!-- Permission chips -->
-                            <WrapPanel Grid.Row="1" Margin="0,0,0,16">
-
-                                <Border CornerRadius="18"
-                                        Background="#EFF6FF"
-                                        BorderBrush="#BFDBFE"
-                                        BorderThickness="1"
-                                        Padding="12,7"
-                                        Margin="0,0,8,8">
-                                    <StackPanel Orientation="Horizontal">
-                                        <ui:SymbolIcon Symbol="Eye24"
-                                                       Foreground="#2563EB"
-                                                       FontSize="16"
-                                                       Margin="0,0,6,0"/>
-                                        <TextBlock Text="Xem"
-                                                   Foreground="#1E3A8A"
-                                                   FontWeight="SemiBold"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <Border CornerRadius="18"
-                                        Background="#ECFDF5"
-                                        BorderBrush="#BBF7D0"
-                                        BorderThickness="1"
-                                        Padding="12,7"
-                                        Margin="0,0,8,8">
-                                    <StackPanel Orientation="Horizontal">
-                                        <ui:SymbolIcon Symbol="Add24"
-                                                       Foreground="#059669"
-                                                       FontSize="16"
-                                                       Margin="0,0,6,0"/>
-                                        <TextBlock Text="Thêm"
-                                                   Foreground="#047857"
-                                                   FontWeight="SemiBold"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <Border CornerRadius="18"
-                                        Background="#FEF3C7"
-                                        BorderBrush="#FDE68A"
-                                        BorderThickness="1"
-                                        Padding="12,7"
-                                        Margin="0,0,8,8">
-                                    <StackPanel Orientation="Horizontal">
-                                        <ui:SymbolIcon Symbol="Edit24"
-                                                       Foreground="#D97706"
-                                                       FontSize="16"
-                                                       Margin="0,0,6,0"/>
-                                        <TextBlock Text="Sửa"
-                                                   Foreground="#92400E"
-                                                   FontWeight="SemiBold"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <Border CornerRadius="18"
-                                        Background="#F5F3FF"
-                                        BorderBrush="#DDD6FE"
-                                        BorderThickness="1"
-                                        Padding="12,7"
-                                        Margin="0,0,8,8">
-                                    <StackPanel Orientation="Horizontal">
-                                        <ui:SymbolIcon Symbol="PeopleTeam24"
-                                                       Foreground="#7C3AED"
-                                                       FontSize="16"
-                                                       Margin="0,0,6,0"/>
-                                        <TextBlock Text="Quản lý thành viên"
-                                                   Foreground="#6D28D9"
-                                                   FontWeight="SemiBold"/>
-                                    </StackPanel>
-                                </Border>
-
-                            </WrapPanel>
-
-                            <!-- Documents table -->
+                            <!-- MEMBER TABLE -->
                             <Border Grid.Row="2"
                                     CornerRadius="20"
                                     Background="#FFFFFF"
@@ -652,8 +761,7 @@
                                     BorderThickness="1"
                                     ClipToBounds="True">
 
-                                <DataGrid ItemsSource="{Binding GroupDocuments}"
-                                          SelectedItem="{Binding SelectedDocument}"
+                                <DataGrid x:Name="DgMembers"
                                           AutoGenerateColumns="False"
                                           IsReadOnly="True"
                                           HeadersVisibility="Column"
@@ -667,57 +775,47 @@
                                           AlternationCount="2">
 
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Tên tài liệu"
-                                                            Binding="{Binding TenTaiLieu}"
+                                        <DataGridTextColumn Header="Tên hiển thị"
+                                                            Binding="{Binding TenHienThi}"
                                                             Width="*"/>
 
-                                        <DataGridTextColumn Header="Loại"
-                                                            Binding="{Binding DinhDang}"
-                                                            Width="90"/>
+                                        <DataGridTextColumn Header="ID ẩn danh"
+                                                            Binding="{Binding MaNgauNhien}"
+                                                            Width="125"/>
 
-                                        <DataGridTextColumn Header="Dung lượng"
-                                                            Binding="{Binding DungLuongHienThi}"
+                                        <DataGridTextColumn Header="Email"
+                                                            Binding="{Binding Email}"
+                                                            Width="190"/>
+
+                                        <DataGridTextColumn Header="Vai trò"
+                                                            Binding="{Binding VaiTroTrongNhom}"
                                                             Width="105"/>
 
-                                        <DataGridTextColumn Header="Phiên bản"
-                                                            Binding="{Binding PhienBan}"
-                                                            Width="95"/>
+                                        <DataGridTextColumn Header="Quyền"
+                                                            Binding="{Binding QuyenHienThi}"
+                                                            Width="170"/>
 
-                                        <DataGridTextColumn Header="Cập nhật"
-                                                            Binding="{Binding NgayCapNhat, StringFormat='dd/MM/yyyy'}"
+                                        <DataGridTextColumn Header="Ngày tham gia"
+                                                            Binding="{Binding NgayThamGia, StringFormat='dd/MM/yyyy'}"
                                                             Width="115"/>
 
-                                        <DataGridTemplateColumn Header="Thao tác" Width="150">
+                                        <DataGridTemplateColumn Header="Thao tác" Width="125">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal"
                                                                 HorizontalAlignment="Center">
 
                                                         <Button Style="{StaticResource IconButtonStyle}"
-                                                                ToolTip="Xem"
-                                                                Margin="2,0"
-                                                                Command="{Binding DataContext.ViewDocumentCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                                CommandParameter="{Binding}">
-                                                            <ui:SymbolIcon Symbol="Eye24"
-                                                                           Foreground="#2563EB"
+                                                                ToolTip="Sửa quyền"
+                                                                Margin="2,0">
+                                                            <ui:SymbolIcon Symbol="Edit24"
+                                                                           Foreground="#D97706"
                                                                            FontSize="15"/>
                                                         </Button>
 
                                                         <Button Style="{StaticResource IconButtonStyle}"
-                                                                ToolTip="Tải xuống"
-                                                                Margin="2,0"
-                                                                Command="{Binding DataContext.DownloadDocumentCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                                CommandParameter="{Binding}">
-                                                            <ui:SymbolIcon Symbol="ArrowDownload24"
-                                                                           Foreground="#059669"
-                                                                           FontSize="15"/>
-                                                        </Button>
-
-                                                        <Button Style="{StaticResource IconButtonStyle}"
-                                                                ToolTip="Xóa"
-                                                                Margin="2,0"
-                                                                Command="{Binding DataContext.DeleteGroupDocumentCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                                CommandParameter="{Binding}">
+                                                                ToolTip="Xóa khỏi nhóm"
+                                                                Margin="2,0">
                                                             <ui:SymbolIcon Symbol="Delete24"
                                                                            Foreground="#EF4444"
                                                                            FontSize="15"/>
@@ -734,216 +832,299 @@
                     </Border>
 
                     <!-- =========================
-                         RIGHT MEMBERS + ACTIVITY
+                         RIGHT: PHÂN QUYỀN + LỜI MỜI + LOG
                     ========================== -->
-                    <StackPanel Grid.Column="2">
+                    <ScrollViewer Grid.Column="2"
+                                  VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
 
-                        <!-- Members -->
-                        <Border Style="{StaticResource GlassCardStyle}"
-                                Padding="18"
-                                Margin="0,0,0,14">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                            <!-- INVITE MEMBER -->
+                            <Border Style="{StaticResource GlassCardStyle}"
+                                    Padding="18"
+                                    Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Mời thành viên"
+                                               Style="{StaticResource SectionTitleStyle}"/>
 
-                                    <StackPanel>
-                                        <TextBlock Text="Thành viên"
-                                                   Style="{StaticResource SectionTitleStyle}"/>
+                                    <TextBlock Text="Tìm người dùng bằng ID ẩn danh hoặc Email để thêm vào nhóm."
+                                               Style="{StaticResource MutedTextStyle}"
+                                               Margin="0,4,0,12"/>
 
-                                        <TextBlock Text="Quản lý quyền truy cập nhóm."
-                                                   Style="{StaticResource MutedTextStyle}"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
+                                    <Border Style="{StaticResource SearchBorderStyle}"
+                                            Margin="0,0,0,10">
+                                        <ui:TextBox x:Name="TxtFindUser"
+                                                    PlaceholderText="UID hoặc Email..."
+                                                    Icon="{ui:SymbolIcon Search24}"
+                                                    Style="{StaticResource SearchTextBoxStyle}"/>
+                                    </Border>
 
-                                    <Button Grid.Column="1"
-                                            Style="{StaticResource IconButtonStyle}"
-                                            Command="{Binding AddMemberCommand}"
-                                            ToolTip="Thêm thành viên">
-                                        <ui:SymbolIcon Symbol="PersonAdd24"
-                                                       Foreground="#2563EB"
-                                                       FontSize="18"/>
+                                    <Button x:Name="BtnFindUser"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            Margin="0,0,0,10">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="Search24"
+                                                           Foreground="#2563EB"
+                                                           FontSize="18"
+                                                           Margin="0,0,7,0"/>
+                                            <TextBlock Text="Tìm người dùng"
+                                                       Foreground="#0F172A"/>
+                                        </StackPanel>
                                     </Button>
-                                </Grid>
 
-                                <ItemsControl ItemsSource="{Binding Members}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border CornerRadius="18"
-                                                    Background="#FFFFFF"
-                                                    BorderBrush="#D8E6FF"
-                                                    BorderThickness="1"
-                                                    Padding="12"
-                                                    Margin="0,0,0,10">
+                                    <Border CornerRadius="18"
+                                            Background="#F8FAFC"
+                                            BorderBrush="#D8E6FF"
+                                            BorderThickness="1"
+                                            Padding="12"
+                                            Margin="0,0,0,12">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="Auto"/>
-                                                    </Grid.ColumnDefinitions>
-
-                                                    <Border Width="40"
-                                                            Height="40"
-                                                            CornerRadius="14"
-                                                            Background="#EFF6FF"
-                                                            Margin="0,0,10,0">
-                                                        <ui:SymbolIcon Symbol="Person24"
-                                                                       Foreground="#2563EB"
-                                                                       FontSize="21"
-                                                                       HorizontalAlignment="Center"
-                                                                       VerticalAlignment="Center"/>
-                                                    </Border>
-
-                                                    <StackPanel Grid.Column="1"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding TenHienThi}"
-                                                                   Foreground="#0F172A"
-                                                                   FontWeight="Bold"
-                                                                   FontSize="14"/>
-
-                                                        <TextBlock Text="{Binding VaiTroTrongNhom}"
-                                                                   Foreground="#64748B"
-                                                                   FontSize="12"
-                                                                   Margin="0,3,0,0"/>
-                                                    </StackPanel>
-
-                                                    <Button Grid.Column="2"
-                                                            Style="{StaticResource IconButtonStyle}"
-                                                            Command="{Binding DataContext.EditMemberPermissionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                            CommandParameter="{Binding}"
-                                                            ToolTip="Sửa quyền">
-                                                        <ui:SymbolIcon Symbol="Edit24"
-                                                                       Foreground="#D97706"
-                                                                       FontSize="15"/>
-                                                    </Button>
-                                                </Grid>
+                                            <Border Width="42"
+                                                    Height="42"
+                                                    CornerRadius="15"
+                                                    Background="#EFF6FF"
+                                                    Margin="0,0,10,0">
+                                                <ui:SymbolIcon Symbol="Person24"
+                                                               Foreground="#2563EB"
+                                                               FontSize="22"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
                                             </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
 
-                        <!-- Permission explanation -->
-                        <Border Style="{StaticResource SoftCardStyle}"
-                                Background="#EFF6FF"
-                                BorderBrush="#BFDBFE">
-                            <StackPanel>
-                                <Border Width="48"
-                                        Height="48"
-                                        CornerRadius="17"
-                                        Background="#FFFFFF"
-                                        HorizontalAlignment="Left"
-                                        Margin="0,0,0,12">
-                                    <ui:SymbolIcon Symbol="Shield24"
-                                                   Foreground="#2563EB"
-                                                   FontSize="24"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"/>
-                                </Border>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="Nguyễn Văn A"
+                                                           Foreground="#0F172A"
+                                                           FontWeight="Bold"/>
 
-                                <TextBlock Text="Quyền nhóm"
-                                           Foreground="#0F172A"
-                                           FontSize="17"
-                                           FontWeight="Bold"/>
+                                                <TextBlock Text="UID-8A9B2C"
+                                                           Foreground="#64748B"
+                                                           FontSize="12"
+                                                           Margin="0,3,0,0"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
 
-                                <TextBlock Text="Hệ thống có thể xử lý quyền dạng bitmask: Xem, Thêm, Sửa, Xóa, Chia sẻ và Quản lý thành viên."
-                                           Foreground="#475569"
-                                           FontSize="13"
-                                           TextWrapping="Wrap"
-                                           LineHeight="20"
-                                           Margin="0,6,0,0"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Activity -->
-                        <Border Style="{StaticResource SoftCardStyle}"
-                                Margin="0">
-                            <StackPanel>
-                                <TextBlock Text="Hoạt động gần đây"
-                                           Style="{StaticResource SectionTitleStyle}"/>
-
-                                <StackPanel Margin="0,6,0,0">
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                        <Border Width="32"
-                                                Height="32"
-                                                CornerRadius="12"
-                                                Background="#ECFDF5"
-                                                Margin="0,0,10,0">
-                                            <ui:SymbolIcon Symbol="ArrowUpload24"
-                                                           Foreground="#059669"
-                                                           FontSize="17"
-                                                           HorizontalAlignment="Center"
-                                                           VerticalAlignment="Center"/>
-                                        </Border>
-
-                                        <StackPanel>
-                                            <TextBlock Text="Có tài liệu mới được upload"
-                                                       Foreground="#0F172A"
-                                                       FontWeight="SemiBold"
-                                                       FontSize="13"/>
-                                            <TextBlock Text="Vừa xong"
-                                                       Foreground="#64748B"
-                                                       FontSize="12"/>
+                                    <Button x:Name="BtnSendInvite"
+                                            Style="{StaticResource PrimaryButtonStyle}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="PersonAdd24"
+                                                           Foreground="White"
+                                                           FontSize="18"
+                                                           Margin="0,0,7,0"/>
+                                            <TextBlock Text="Gửi lời mời"
+                                                       Foreground="White"/>
                                         </StackPanel>
-                                    </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                        <Border Width="32"
-                                                Height="32"
-                                                CornerRadius="12"
-                                                Background="#F5F3FF"
-                                                Margin="0,0,10,0">
-                                            <ui:SymbolIcon Symbol="PeopleTeam24"
-                                                           Foreground="#7C3AED"
-                                                           FontSize="17"
-                                                           HorizontalAlignment="Center"
-                                                           VerticalAlignment="Center"/>
-                                        </Border>
+                            <!-- PERMISSION -->
+                            <Border Style="{StaticResource GlassCardStyle}"
+                                    Padding="18"
+                                    Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Phân quyền thành viên"
+                                               Style="{StaticResource SectionTitleStyle}"/>
 
-                                        <StackPanel>
-                                            <TextBlock Text="Thành viên được thêm vào nhóm"
-                                                       Foreground="#0F172A"
-                                                       FontWeight="SemiBold"
-                                                       FontSize="13"/>
-                                            <TextBlock Text="Hôm nay"
-                                                       Foreground="#64748B"
-                                                       FontSize="12"/>
+                                    <TextBlock Text="Chọn quyền theo bitmask cho thành viên đang được chọn."
+                                               Style="{StaticResource MutedTextStyle}"
+                                               Margin="0,4,0,12"/>
+
+                                    <CheckBox x:Name="ChkView"
+                                              Content="Xem tài liệu"
+                                              IsChecked="True"
+                                              FontSize="14"
+                                              Foreground="#0F172A"
+                                              Margin="0,0,0,8"/>
+
+                                    <CheckBox x:Name="ChkAdd"
+                                              Content="Thêm tài liệu"
+                                              IsChecked="True"
+                                              FontSize="14"
+                                              Foreground="#0F172A"
+                                              Margin="0,0,0,8"/>
+
+                                    <CheckBox x:Name="ChkEdit"
+                                              Content="Sửa / cập nhật phiên bản"
+                                              FontSize="14"
+                                              Foreground="#0F172A"
+                                              Margin="0,0,0,8"/>
+
+                                    <CheckBox x:Name="ChkDelete"
+                                              Content="Xóa tài liệu"
+                                              FontSize="14"
+                                              Foreground="#0F172A"
+                                              Margin="0,0,0,8"/>
+
+                                    <CheckBox x:Name="ChkShare"
+                                              Content="Chia sẻ tài liệu"
+                                              IsChecked="True"
+                                              FontSize="14"
+                                              Foreground="#0F172A"
+                                              Margin="0,0,0,8"/>
+
+                                    <CheckBox x:Name="ChkManageMember"
+                                              Content="Quản lý thành viên"
+                                              FontSize="14"
+                                              Foreground="#0F172A"
+                                              Margin="0,0,0,12"/>
+
+                                    <Border CornerRadius="16"
+                                            Background="#EFF6FF"
+                                            BorderBrush="#BFDBFE"
+                                            BorderThickness="1"
+                                            Padding="12"
+                                            Margin="0,0,0,12">
+                                        <TextBlock Foreground="#1E3A8A"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap">
+                                            <Run Text="Giá trị quyền hiện tại: "/>
+                                            <Run Text="19" FontWeight="Bold"/>
+                                            <Run Text="  (Xem + Thêm + Chia sẻ)"/>
+                                        </TextBlock>
+                                    </Border>
+
+                                    <Button x:Name="BtnSavePermission"
+                                            Style="{StaticResource PrimaryButtonStyle}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:SymbolIcon Symbol="Settings24"
+                                                           Foreground="White"
+                                                           FontSize="18"
+                                                           Margin="0,0,7,0"/>
+                                            <TextBlock Text="Lưu quyền"
+                                                       Foreground="White"/>
                                         </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ACTIVITY -->
+                            <Border Style="{StaticResource SoftCardStyle}"
+                                    Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Hoạt động nhóm"
+                                               Style="{StaticResource SectionTitleStyle}"/>
+
+                                    <StackPanel Margin="0,10,0,0">
+
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                            <Border Width="32"
+                                                    Height="32"
+                                                    CornerRadius="12"
+                                                    Background="#ECFDF5"
+                                                    Margin="0,0,10,0">
+                                                <ui:SymbolIcon Symbol="PersonAdd24"
+                                                               Foreground="#059669"
+                                                               FontSize="17"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <StackPanel>
+                                                <TextBlock Text="Đã thêm thành viên mới"
+                                                           Foreground="#0F172A"
+                                                           FontWeight="SemiBold"
+                                                           FontSize="13"/>
+                                                <TextBlock Text="Vừa xong"
+                                                           Foreground="#64748B"
+                                                           FontSize="12"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                            <Border Width="32"
+                                                    Height="32"
+                                                    CornerRadius="12"
+                                                    Background="#FEF3C7"
+                                                    Margin="0,0,10,0">
+                                                <ui:SymbolIcon Symbol="Edit24"
+                                                               Foreground="#D97706"
+                                                               FontSize="17"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <StackPanel>
+                                                <TextBlock Text="Quyền thành viên đã thay đổi"
+                                                           Foreground="#0F172A"
+                                                           FontWeight="SemiBold"
+                                                           FontSize="13"/>
+                                                <TextBlock Text="Hôm nay"
+                                                           Foreground="#64748B"
+                                                           FontSize="12"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="32"
+                                                    Height="32"
+                                                    CornerRadius="12"
+                                                    Background="#EFF6FF"
+                                                    Margin="0,0,10,0">
+                                                <ui:SymbolIcon Symbol="Folder24"
+                                                               Foreground="#2563EB"
+                                                               FontSize="17"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <StackPanel>
+                                                <TextBlock Text="Kho nhóm được mở gần đây"
+                                                           Foreground="#0F172A"
+                                                           FontWeight="SemiBold"
+                                                           FontSize="13"/>
+                                                <TextBlock Text="Gần đây"
+                                                           Foreground="#64748B"
+                                                           FontSize="12"/>
+                                            </StackPanel>
+                                        </StackPanel>
+
                                     </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- DANGER ZONE -->
+                            <Border CornerRadius="22"
+                                    Background="#FEF2F2"
+                                    BorderBrush="#FECACA"
+                                    BorderThickness="1"
+                                    Padding="16">
+                                <StackPanel>
+                                    <TextBlock Text="Vùng nguy hiểm"
+                                               Foreground="#991B1B"
+                                               FontSize="17"
+                                               FontWeight="Bold"/>
+
+                                    <TextBlock Text="Chỉ chủ nhóm hoặc người có quyền quản lý thành viên mới được xóa nhóm hoặc rời nhóm."
+                                               Foreground="#991B1B"
+                                               FontSize="13"
+                                               TextWrapping="Wrap"
+                                               LineHeight="20"
+                                               Margin="0,6,0,12"/>
 
                                     <StackPanel Orientation="Horizontal">
-                                        <Border Width="32"
-                                                Height="32"
-                                                CornerRadius="12"
-                                                Background="#FEF3C7"
+                                        <Button x:Name="BtnLeaveGroup"
+                                                Style="{StaticResource SecondaryButtonStyle}"
                                                 Margin="0,0,10,0">
-                                            <ui:SymbolIcon Symbol="Share24"
-                                                           Foreground="#D97706"
-                                                           FontSize="17"
-                                                           HorizontalAlignment="Center"
-                                                           VerticalAlignment="Center"/>
-                                        </Border>
+                                            <TextBlock Text="Rời nhóm"
+                                                       Foreground="#991B1B"/>
+                                        </Button>
 
-                                        <StackPanel>
-                                            <TextBlock Text="Một tài liệu đã được chia sẻ"
-                                                       Foreground="#0F172A"
-                                                       FontWeight="SemiBold"
-                                                       FontSize="13"/>
-                                            <TextBlock Text="Gần đây"
-                                                       Foreground="#64748B"
-                                                       FontSize="12"/>
-                                        </StackPanel>
+                                        <Button x:Name="BtnDeleteGroup"
+                                                Style="{StaticResource SecondaryButtonStyle}">
+                                            <TextBlock Text="Xóa nhóm"
+                                                       Foreground="#991B1B"/>
+                                        </Button>
                                     </StackPanel>
-
                                 </StackPanel>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
             </Grid>
         </Grid>

@@ -134,6 +134,7 @@ namespace TroLySoCaNhan.ViewModels
         public RelayCommand OpenUpgradeCommand { get; }
         public RelayCommand OpenGroupCommand { get; }
         public RelayCommand DeleteTaiLieuCommand { get; }
+        public RelayCommand OpenStorageCommand { get; }
         public RelayCommand UploadTaiLieuCommand { get; }
 
         public DashboardViewModel()
@@ -149,6 +150,7 @@ namespace TroLySoCaNhan.ViewModels
             DeleteTaiLieuCommand = new RelayCommand(t => { if (t is TaiLieuItem tl) TaiLieus.Remove(tl); });
             UploadTaiLieuCommand = new RelayCommand(async _ => await SimulateUploadAsync(), _ => !IsLoading);
             OpenGroupCommand = new RelayCommand(_ => GroupRequested?.Invoke(this, EventArgs.Empty));
+            OpenStorageCommand = new RelayCommand(_ => StorageRequested?.Invoke(this, EventArgs.Empty));
         }
 
         // ==========================================
@@ -158,6 +160,7 @@ namespace TroLySoCaNhan.ViewModels
         public event EventHandler? SettingsRequested;
         public event EventHandler? UpgradeRequested;
         public event EventHandler? GroupRequested;
+        public event EventHandler? StorageRequested;
 
         // ==========================================
         // HANDLERS

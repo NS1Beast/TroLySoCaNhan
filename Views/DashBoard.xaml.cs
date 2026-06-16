@@ -25,6 +25,7 @@ namespace TroLySoCaNhan.Views
             vm.GroupRequested += Vm_GroupRequested;
             vm.SettingsRequested += Vm_SettingsRequested;
             vm.UpgradeRequested += Vm_UpgradeRequested;
+            vm.StorageRequested += Vm_StorageRequested;
         }
 
         private void UnregisterViewModelEvents(DashboardViewModel vm)
@@ -33,6 +34,7 @@ namespace TroLySoCaNhan.Views
             vm.GroupRequested -= Vm_GroupRequested;
             vm.SettingsRequested -= Vm_SettingsRequested;
             vm.UpgradeRequested -= Vm_UpgradeRequested;
+            vm.StorageRequested -= Vm_StorageRequested;
         }
 
         private void Vm_ProfileRequested(object? sender, EventArgs e)
@@ -47,7 +49,15 @@ namespace TroLySoCaNhan.Views
 
             win.ShowDialog();
         }
+        private void Vm_StorageRequested(object? sender, EventArgs e)
+        {
+            var win = new Storage
+            {
+                Owner = this
+            };
 
+            win.ShowDialog();
+        }
         private void Vm_GroupRequested(object? sender, EventArgs e)
         {
             var win = new Group

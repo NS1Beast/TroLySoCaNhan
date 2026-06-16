@@ -3,39 +3,35 @@ using System.Windows.Input;
 
 namespace TroLySoCaNhan.MVVM
 {
-    /// <summary>
-    /// ICommand đơn giản, dùng cho binding Command trong MVVM.
-    /// Hỗ trợ cả Action (không tham số) và Action&lt;object&gt; (có tham số).
-    /// </summary>
     public class RelayCommand : ICommand
     {
         private readonly Action<object?> _execute;
-        private readonly Func<object?, bool>? _canExecute;
+        private readonly Predicate<object?>? _canExecute;
 
-        public RelayCommand(Action execute, Func<bool>? canExecute = null)
-            : this(_ => execute(), canExecute == null ? null : new Func<object?, bool>(_ => canExecute()))
-        {
-        }
+        // Sự kiện báo cho giao diện (UI) biết trạng thái nút bấm đã thay đổi
+        public event EventHandler? CanExecuteChanged;
 
-        public RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null)
+        // Constructor nhận 1 hoặc 2 tham số (Hàm chạy, Hàm điều kiện)
+        public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
 
-        public bool CanExecute(object? parameter) => _canExecute == null || _canExecute(parameter);
+        public bool CanExecute(object? parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
 
-        public void Execute(object? parameter) => _execute(parameter);
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
 
-        /// <summary>
-        /// Yêu cầu WPF re-evaluate CanExecute trên tất cả CommandBindings.
-        /// Gọi khi điều kiện enable thay đổi.
-        /// </summary>
+        // Hàm ép giao diện cập nhật trạng thái mờ/sáng của nút
         public void RaiseCanExecuteChanged()
         {
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
-
-        public event EventHandler? CanExecuteChanged;
     }
 }
