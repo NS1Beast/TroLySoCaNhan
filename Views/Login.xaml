@@ -9,213 +9,756 @@
                  xmlns:helpers="clr-namespace:TroLySoCaNhan.MVVM.Converters"
                  mc:Ignorable="d"
                  Title="Đăng nhập - Trợ lý số cá nhân"
-                 Height="650" Width="1000"
+                 Height="680"
+                 Width="1080"
+                 MinHeight="640"
+                 MinWidth="980"
                  WindowBackdropType="Mica"
                  ExtendsContentIntoTitleBar="True"
-                 WindowStartupLocation="CenterScreen">
+                 WindowStartupLocation="CenterScreen"
+                 TextOptions.TextFormattingMode="Display"
+                 TextOptions.TextRenderingMode="ClearType">
 
     <ui:FluentWindow.DataContext>
         <vm:LoginViewModel />
     </ui:FluentWindow.DataContext>
 
-    <!-- Chỉ giữ hiệu ứng Parallax ở code-behind (không phải business logic) -->
+    <ui:FluentWindow.Resources>
+
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
+        <SolidColorBrush x:Key="InputBackgroundBrush" Color="#F8FAFC"/>
+        <SolidColorBrush x:Key="InputBorderBrush" Color="#D8E6FF"/>
+
+        <Style x:Key="FormTitleStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <Style x:Key="FormSubTitleStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="LineHeight" Value="21"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,24"/>
+        </Style>
+
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,7"/>
+        </Style>
+
+        <!-- Border ngoài dùng để bo tròn input -->
+        <Style x:Key="RoundedInputBorderStyle" TargetType="Border">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Background" Value="{StaticResource InputBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource InputBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
+
+        <!-- TextBox bên trong: bỏ viền để ăn theo Border ngoài -->
+        <Style x:Key="ModernTextBoxStyle" TargetType="{x:Type ui:TextBox}">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="14,0,14,0"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <Style x:Key="ModernPasswordBoxStyle" TargetType="{x:Type ui:PasswordBox}">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="14,0,14,0"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+
+        <!-- Button xanh bo tròn, không dùng ui:Button để tránh lỗi CornerRadius -->
+        <Style x:Key="RoundedPrimaryButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="BorderBrush" Value="#2563EB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="18">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1D4ED8"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#1D4ED8"/>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1E40AF"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#1E40AF"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Button trắng bo tròn -->
+        <Style x:Key="RoundedSecondaryButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#D8E6FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="18">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#BFDBFE"/>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#DBEAFE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Button quay lại dạng trong suốt -->
+        <Style x:Key="RoundedGhostButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#DBEAFE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </ui:FluentWindow.Resources>
+
     <Grid MouseMove="Grid_MouseMove">
+
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#0f172a" Offset="0.0" />
-                <GradientStop Color="#1e293b" Offset="1.0" />
+                <GradientStop Color="#FFFFFF" Offset="0.00"/>
+                <GradientStop Color="#F3F9FF" Offset="0.35"/>
+                <GradientStop Color="#DBEAFE" Offset="0.72"/>
+                <GradientStop Color="#EFF6FF" Offset="1.00"/>
             </LinearGradientBrush>
         </Grid.Background>
 
-        <ui:TitleBar Title="Trợ Lý Số Cá Nhân" VerticalAlignment="Top" Foreground="White">
+        <Ellipse Width="420"
+                 Height="420"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Top"
+                 Margin="-150,-170,0,0"
+                 Opacity="0.55">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#60A5FA" Offset="0"/>
+                    <GradientStop Color="#BFDBFE" Offset="0.55"/>
+                    <GradientStop Color="#00FFFFFF" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+            <Ellipse.Effect>
+                <BlurEffect Radius="38"/>
+            </Ellipse.Effect>
+        </Ellipse>
+
+        <Ellipse Width="520"
+                 Height="520"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Bottom"
+                 Margin="0,0,-210,-210"
+                 Opacity="0.45">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#93C5FD" Offset="0"/>
+                    <GradientStop Color="#DBEAFE" Offset="0.55"/>
+                    <GradientStop Color="#00FFFFFF" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+            <Ellipse.Effect>
+                <BlurEffect Radius="45"/>
+            </Ellipse.Effect>
+        </Ellipse>
+
+        <ui:TitleBar Title="Trợ Lý Số Cá Nhân"
+                     VerticalAlignment="Top"
+                     Foreground="#0F172A"
+                     Background="Transparent">
             <ui:TitleBar.Icon>
-                <ui:SymbolIcon Symbol="Bot24" Foreground="#3b82f6" />
+                <ui:SymbolIcon Symbol="Bot24" Foreground="#2563EB"/>
             </ui:TitleBar.Icon>
         </ui:TitleBar>
 
-        <Grid Margin="0,32,0,0">
-            <Grid Width="860" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid Margin="52,58,52,42"
+              Width="980"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center">
 
-                <!-- PHẦN BRANDING (Bên phải) -->
-                <StackPanel x:Name="pnlBranding" HorizontalAlignment="Right" VerticalAlignment="Center" Width="380">
-                    <StackPanel.RenderTransform>
-                        <TranslateTransform x:Name="transBranding" X="0"/>
-                    </StackPanel.RenderTransform>
-                    <ui:SymbolIcon Symbol="Bot24" FontSize="90" Foreground="#3b82f6" Margin="0,0,0,20"/>
-                    <TextBlock Text="Trợ Lý Số Cá Nhân" FontSize="42" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" />
-                    <TextBlock Text="Không gian quản lý tài liệu, tài khoản và giao tiếp an toàn, thông minh." FontSize="16" Foreground="#94a3b8" Margin="0,15,0,0" TextWrapping="Wrap" TextAlignment="Center" />
-                </StackPanel>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="440"/>
+            </Grid.ColumnDefinitions>
 
-                <!-- PHẦN FORM CARD (Bên trái) -->
-                <Border x:Name="cardForm" HorizontalAlignment="Left" VerticalAlignment="Center" Width="410" Height="580"
-                        CornerRadius="16" Background="#1e293b"
-                        BorderBrush="#334155" BorderThickness="1" ClipToBounds="True">
+            <StackPanel x:Name="pnlBranding"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="0,0,54,0">
+
+                <StackPanel.RenderTransform>
+                    <TranslateTransform x:Name="transBranding" X="0"/>
+                </StackPanel.RenderTransform>
+
+                <Border Width="76"
+                        Height="76"
+                        HorizontalAlignment="Left"
+                        CornerRadius="24"
+                        Background="#EAF3FF"
+                        BorderBrush="#BBD7FF"
+                        BorderThickness="1"
+                        Margin="0,0,0,22">
                     <Border.Effect>
-                        <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.5" Color="Black"/>
+                        <DropShadowEffect BlurRadius="28"
+                                          ShadowDepth="8"
+                                          Opacity="0.18"
+                                          Color="#2563EB"/>
                     </Border.Effect>
-                    <Border.RenderTransform>
-                        <TranslateTransform x:Name="transCard" X="0"/>
-                    </Border.RenderTransform>
+
+                    <ui:SymbolIcon Symbol="Bot24"
+                                   FontSize="38"
+                                   Foreground="#2563EB"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                </Border>
+
+                <TextBlock Text="Quản lý cuộc sống số"
+                           Foreground="#2563EB"
+                           FontSize="15"
+                           FontWeight="SemiBold"
+                           Margin="0,0,0,10"/>
+
+                <TextBlock Text="Đăng nhập vào&#x0a;Trợ Lý Số Cá Nhân"
+                           Foreground="#0F172A"
+                           FontSize="44"
+                           FontWeight="Bold"
+                           LineHeight="52"
+                           Margin="0,0,0,16"/>
+
+                <TextBlock Text="Không gian quản lý tài liệu, tài khoản, thông báo và công việc cá nhân theo cách an toàn, gọn gàng và hiện đại."
+                           Foreground="#475569"
+                           FontSize="16"
+                           TextWrapping="Wrap"
+                           LineHeight="25"
+                           Width="440"
+                           HorizontalAlignment="Left"
+                           Margin="0,0,0,26"/>
+
+                <WrapPanel Margin="0,0,0,30">
+
+                    <Border CornerRadius="18" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" Padding="14,9" Margin="0,0,10,10">
+                        <TextBlock Text="Tài liệu" Foreground="#1E3A8A" FontWeight="SemiBold"/>
+                    </Border>
+
+                    <Border CornerRadius="18" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" Padding="14,9" Margin="0,0,10,10">
+                        <TextBlock Text="Tài khoản" Foreground="#1E3A8A" FontWeight="SemiBold"/>
+                    </Border>
+
+                    <Border CornerRadius="18" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" Padding="14,9" Margin="0,0,10,10">
+                        <TextBlock Text="Bảo mật" Foreground="#1E3A8A" FontWeight="SemiBold"/>
+                    </Border>
+
+                    <Border CornerRadius="18" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" Padding="14,9" Margin="0,0,10,10">
+                        <TextBlock Text="Thông minh" Foreground="#1E3A8A" FontWeight="SemiBold"/>
+                    </Border>
+
+                </WrapPanel>
+
+                <Border CornerRadius="24"
+                        Background="#DDEBFF"
+                        BorderBrush="#BBD7FF"
+                        BorderThickness="1"
+                        Padding="22"
+                        Width="420"
+                        HorizontalAlignment="Left">
 
                     <Grid>
-                        <!-- 1. PANEL ĐĂNG NHẬP -->
-                        <StackPanel x:Name="pnlLogin" Background="Transparent" Margin="40,35">
-                            <StackPanel.RenderTransform>
-                                <TranslateTransform x:Name="transLogin" X="0"/>
-                            </StackPanel.RenderTransform>
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ActivePanel}" Value="Register">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding ActivePanel}" Value="Forgot">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-                            <TextBlock Text="Chào mừng trở lại!" FontSize="28" FontWeight="Bold" Margin="0,0,0,25" Foreground="White" HorizontalAlignment="Center"/>
+                        <Border Width="46"
+                                Height="46"
+                                CornerRadius="16"
+                                Background="#FFFFFF"
+                                Margin="0,0,14,0">
+                            <ui:SymbolIcon Symbol="LockShield24"
+                                           Foreground="#2563EB"
+                                           FontSize="24"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                        </Border>
 
-                            <TextBlock Text="Tên đăng nhập / Email" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#94a3b8"/>
-                            <ui:TextBox PlaceholderText="Nhập email của bạn"
-                                        Icon="{ui:SymbolIcon Person24}"
-                                        Margin="0,0,0,15" Height="40" Foreground="White"
-                                        Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Dữ liệu cá nhân được ưu tiên"
+                                       Foreground="#0F172A"
+                                       FontWeight="Bold"
+                                       FontSize="15"
+                                       Margin="0,0,0,4"/>
 
-                            <TextBlock Text="Mật khẩu" FontWeight="SemiBold" Margin="0,0,0,8" Foreground="#94a3b8"/>
-                            <ui:PasswordBox PlaceholderText="••••••••"
-                                            Icon="{ui:SymbolIcon Password24}"
-                                            Margin="0,0,0,10" Height="40" Foreground="White"
-                                            PasswordChanged="txtPassword_PasswordChanged"/>
-
-                            <!-- Dòng báo lỗi -->
-                            <TextBlock Text="{Binding ErrorMessage}" Foreground="#f87171"
-                                       FontSize="12" Margin="0,0,0,8"
-                                       Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibility}}" />
-
-                            <Grid Margin="0,0,0,20">
-                                <CheckBox Content="Nhớ tài khoản" Foreground="#94a3b8"
-                                          IsChecked="{Binding RememberMe}"
-                                          HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <Hyperlink TextDecorations="None" Foreground="#3b82f6"
-                                               Command="{Binding ShowForgotCommand}">Quên mật khẩu?</Hyperlink>
-                                </TextBlock>
-                            </Grid>
-
-                            <!-- Nút Đăng nhập -->
-                            <ui:Button Appearance="Primary" Background="#3b82f6" BorderBrush="#3b82f6"
-                                       HorizontalAlignment="Stretch" Margin="0,0,0,15" Height="45"
-                                       Command="{Binding LoginCommand}">
-                                <Grid>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                                                Visibility="{Binding IsLoggingIn, Converter={StaticResource InverseBoolToVisibility}}">
-                                        <ui:SymbolIcon Symbol="ArrowRight24" Margin="0,0,8,0" FontSize="18" Foreground="White"/>
-                                        <TextBlock Text="Đăng nhập" FontSize="15" FontWeight="Bold" Foreground="White"/>
-                                    </StackPanel>
-                                    <ui:ProgressRing IsIndeterminate="True" Width="20" Height="20" Foreground="White"
-                                                     Visibility="{Binding IsLoggingIn, Converter={StaticResource BoolToVisibility}}"/>
-                                </Grid>
-                            </ui:Button>
-
-                            <!-- Đường chia cắt HOẶC -->
-                            <Grid Margin="0,0,0,15">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Separator Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0" Background="#334155"/>
-                                <TextBlock Grid.Column="1" Text="HOẶC" Foreground="#64748b" FontSize="12"/>
-                                <Separator Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0" Background="#334155"/>
-                            </Grid>
-
-                            <!-- Nút OpenID thay cho tài khoản khách -->
-                            <ui:Button Appearance="Secondary" HorizontalAlignment="Stretch" Margin="0,0,0,20" Height="45"
-                                       Background="#0f172a" BorderBrush="#334155">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:SymbolIcon Symbol="ShieldKeyhole24" Foreground="White" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Đăng nhập qua OpenID / SSO" Foreground="White" FontWeight="SemiBold"/>
-                                </StackPanel>
-                            </ui:Button>
-
-                            <!-- Link Đăng ký -->
-                            <TextBlock HorizontalAlignment="Center">
-                                <Run Text="Chưa có tài khoản? " Foreground="#94a3b8"/>
-                                <Hyperlink TextDecorations="None" Foreground="#3b82f6" FontWeight="SemiBold"
-                                           Command="{Binding ShowRegisterCommand}">Tạo tài khoản</Hyperlink>
-                            </TextBlock>
-                        </StackPanel>
-
-                        <!-- 2. PANEL ĐĂNG KÝ -->
-                        <StackPanel x:Name="pnlRegister" Background="Transparent" Margin="40,30"
-                                    Visibility="{Binding ActivePanel, Converter={StaticResource StringToVisibility}, ConverterParameter=Register}">
-                            <StackPanel.RenderTransform>
-                                <TranslateTransform x:Name="transRegister" X="420"/>
-                            </StackPanel.RenderTransform>
-                            <TextBlock Text="Tạo tài khoản mới" FontSize="26" FontWeight="Bold" Margin="0,0,0,20" Foreground="White" HorizontalAlignment="Center"/>
-                            <ui:TextBox PlaceholderText="Họ và tên" Icon="{ui:SymbolIcon Person24}" Margin="0,0,0,15" Height="38" Foreground="White"
-                                        Text="{Binding RegFullName, UpdateSourceTrigger=PropertyChanged}" />
-                            <ui:TextBox PlaceholderText="Email" Icon="{ui:SymbolIcon Mail24}" Margin="0,0,0,15" Height="38" Foreground="White"
-                                        Text="{Binding RegEmail, UpdateSourceTrigger=PropertyChanged}" />
-                            <ui:PasswordBox PlaceholderText="Mật khẩu" Icon="{ui:SymbolIcon LockClosed24}" Margin="0,0,0,15" Height="38" Foreground="White"
-                                            helpers:PasswordBoxHelper.BoundPassword="{Binding RegPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <ui:PasswordBox PlaceholderText="Nhập lại mật khẩu" Icon="{ui:SymbolIcon LockClosed24}" Margin="0,0,0,15" Height="38" Foreground="White"
-                                            helpers:PasswordBoxHelper.BoundPassword="{Binding RegConfirmPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <ui:Button Appearance="Primary" Background="#3b82f6" BorderBrush="#3b82f6"
-                                       HorizontalAlignment="Stretch" Margin="0,15,0,20" Height="45"
-                                       Command="{Binding RegisterCommand}">
-                                <Grid>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                                                Visibility="{Binding IsRegistering, Converter={StaticResource InverseBoolToVisibility}}">
-                                        <ui:SymbolIcon Symbol="Add24" Margin="0,0,8,0" FontSize="18" Foreground="White"/>
-                                        <TextBlock Text="Đăng ký tài khoản" FontSize="15" FontWeight="Bold" Foreground="White"/>
-                                    </StackPanel>
-                                    <ui:ProgressRing IsIndeterminate="True" Width="20" Height="20" Foreground="White"
-                                                     Visibility="{Binding IsRegistering, Converter={StaticResource BoolToVisibility}}"/>
-                                </Grid>
-                            </ui:Button>
-                            <TextBlock HorizontalAlignment="Center">
-                                <Hyperlink TextDecorations="None" Foreground="#3b82f6" FontWeight="SemiBold"
-                                           Command="{Binding ShowLoginCommand}">Quay lại đăng nhập</Hyperlink>
-                            </TextBlock>
-                        </StackPanel>
-
-                        <!-- 3. PANEL QUÊN MẬT KHẨU -->
-                        <StackPanel x:Name="pnlForgotPassword" Background="Transparent" Margin="40,30"
-                                    Visibility="{Binding ActivePanel, Converter={StaticResource StringToVisibility}, ConverterParameter=Forgot}">
-                            <StackPanel.RenderTransform>
-                                <TranslateTransform x:Name="transForgot" X="420"/>
-                            </StackPanel.RenderTransform>
-                            <TextBlock Text="Khôi phục mật khẩu" FontSize="24" FontWeight="Bold" Margin="0,0,0,15" Foreground="White" HorizontalAlignment="Center"/>
-                            <ui:TextBox PlaceholderText="Email đăng ký" Icon="{ui:SymbolIcon Mail24}" Margin="0,0,0,15" Height="38" Foreground="White"
-                                        Text="{Binding ForgotEmail, UpdateSourceTrigger=PropertyChanged}" />
-
-                            <ui:Button Appearance="Primary" Background="#3b82f6" BorderBrush="#3b82f6"
-                                       HorizontalAlignment="Stretch" Margin="0,15,0,20" Height="45"
-                                       Command="{Binding ForgotPasswordCommand}">
-                                <Grid>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
-                                                Visibility="{Binding IsSendingForgot, Converter={StaticResource InverseBoolToVisibility}}">
-                                        <ui:SymbolIcon Symbol="Send24" Margin="0,0,8,0" FontSize="18" Foreground="White"/>
-                                        <TextBlock Text="Gửi mã khôi phục" FontSize="15" FontWeight="Bold" Foreground="White"/>
-                                    </StackPanel>
-                                    <ui:ProgressRing IsIndeterminate="True" Width="20" Height="20" Foreground="White"
-                                                     Visibility="{Binding IsSendingForgot, Converter={StaticResource BoolToVisibility}}"/>
-                                </Grid>
-                            </ui:Button>
-                            <TextBlock HorizontalAlignment="Center">
-                                <Hyperlink TextDecorations="None" Foreground="#3b82f6" FontWeight="SemiBold"
-                                           Command="{Binding ShowLoginCommand}">Quay lại</Hyperlink>
-                            </TextBlock>
+                            <TextBlock Text="Thiết kế phù hợp cho ứng dụng quản lý cá nhân, có cảm giác tin cậy và chuyên nghiệp hơn."
+                                       Foreground="#475569"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"
+                                       LineHeight="19"/>
                         </StackPanel>
                     </Grid>
                 </Border>
-            </Grid>
+
+            </StackPanel>
+
+            <Border x:Name="cardForm"
+                    Grid.Column="1"
+                    Width="430"
+                    MinHeight="574"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    CornerRadius="32"
+                    Background="#EEFFFFFF"
+                    BorderBrush="#CFE3FF"
+                    BorderThickness="1"
+                    ClipToBounds="True">
+
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="48"
+                                      ShadowDepth="14"
+                                      Opacity="0.18"
+                                      Color="#2563EB"/>
+                </Border.Effect>
+
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="transCard" X="0"/>
+                </Border.RenderTransform>
+
+                <Grid ClipToBounds="True">
+
+                    <!-- PANEL ĐĂNG NHẬP -->
+                    <StackPanel x:Name="pnlLogin"
+                                Margin="36,34"
+                                Opacity="1"
+                                IsHitTestVisible="True">
+
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform x:Name="transLogin" X="0"/>
+                        </StackPanel.RenderTransform>
+
+                        <TextBlock Text="Chào mừng trở lại"
+                                   Style="{StaticResource FormTitleStyle}"/>
+
+                        <TextBlock Text="Đăng nhập để tiếp tục quản lý tài liệu, tài khoản và công việc cá nhân của bạn."
+                                   Style="{StaticResource FormSubTitleStyle}"/>
+
+                        <TextBlock Text="Tên đăng nhập / Email"
+                                   Style="{StaticResource LabelStyle}"/>
+
+                        <Border Style="{StaticResource RoundedInputBorderStyle}">
+                            <ui:TextBox PlaceholderText="Nhập email hoặc tên tài khoản"
+                                        Icon="{ui:SymbolIcon Person24}"
+                                        ClearButtonEnabled="True"
+                                        Style="{StaticResource ModernTextBoxStyle}"
+                                        Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+
+                        <TextBlock Text="Mật khẩu"
+                                   Style="{StaticResource LabelStyle}"/>
+
+                        <Border Style="{StaticResource RoundedInputBorderStyle}" Margin="0,0,0,8">
+                            <ui:PasswordBox PlaceholderText="Nhập mật khẩu"
+                                            Icon="{ui:SymbolIcon Password24}"
+                                            Style="{StaticResource ModernPasswordBoxStyle}"
+                                            PasswordChanged="txtPassword_PasswordChanged"/>
+                        </Border>
+
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="#EF4444"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Margin="0,0,0,12"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibility}}"/>
+
+                        <Grid Margin="0,0,0,22">
+                            <CheckBox Content="Ghi nhớ đăng nhập"
+                                      Foreground="#475569"
+                                      FontSize="13"
+                                      IsChecked="{Binding RememberMe}"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"/>
+
+                            <TextBlock HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       FontSize="13">
+                                <Hyperlink TextDecorations="None"
+                                           Foreground="#2563EB"
+                                           FontWeight="SemiBold"
+                                           Command="{Binding ShowForgotCommand}">
+                                    Quên mật khẩu?
+                                </Hyperlink>
+                            </TextBlock>
+                        </Grid>
+
+                        <Button Style="{StaticResource RoundedPrimaryButtonStyle}"
+                                Margin="0,0,0,16"
+                                Command="{Binding LoginCommand}">
+
+                            <Grid>
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center"
+                                            Visibility="{Binding IsLoggingIn, Converter={StaticResource InverseBoolToVisibility}}">
+                                    <TextBlock Text="Đăng nhập"
+                                               FontSize="15"
+                                               FontWeight="Bold"
+                                               Margin="0,0,8,0"/>
+                                    <ui:SymbolIcon Symbol="ArrowRight24"
+                                                   FontSize="18"/>
+                                </StackPanel>
+
+                                <ui:ProgressRing IsIndeterminate="True"
+                                                 Width="20"
+                                                 Height="20"
+                                                 Visibility="{Binding IsLoggingIn, Converter={StaticResource BoolToVisibility}}"/>
+                            </Grid>
+                        </Button>
+
+                        <Grid Margin="0,4,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Separator Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,14,0"
+                                       Background="#D7E4F7"/>
+
+                            <TextBlock Grid.Column="1"
+                                       Text="Hoặc"
+                                       Foreground="#94A3B8"
+                                       FontSize="12"/>
+
+                            <Separator Grid.Column="2"
+                                       VerticalAlignment="Center"
+                                       Margin="14,0,0,0"
+                                       Background="#D7E4F7"/>
+                        </Grid>
+
+                        <Button Style="{StaticResource RoundedSecondaryButtonStyle}"
+                                Margin="0,0,0,24">
+
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
+
+                                <Image Source="pack://application:,,,/Icon/google_logo_icon_169090.png"
+                                       Width="20"
+                                       Height="20"
+                                       Stretch="Uniform"
+                                       Margin="0,0,10,0"
+                                       VerticalAlignment="Center"/>
+
+                                <TextBlock Text="Đăng nhập qua Google"
+                                           Foreground="#0F172A"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock HorizontalAlignment="Center"
+                                   FontSize="14">
+                            <Run Text="Chưa có tài khoản? "
+                                 Foreground="#64748B"/>
+                            <Hyperlink TextDecorations="None"
+                                       Foreground="#2563EB"
+                                       FontWeight="Bold"
+                                       Command="{Binding ShowRegisterCommand}">
+                                Đăng ký ngay
+                            </Hyperlink>
+                        </TextBlock>
+
+                    </StackPanel>
+
+                    <!-- PANEL ĐĂNG KÝ -->
+                    <StackPanel x:Name="pnlRegister"
+                                Margin="36,32"
+                                Opacity="0"
+                                IsHitTestVisible="False">
+
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform x:Name="transRegister" X="450"/>
+                        </StackPanel.RenderTransform>
+
+                        <Button Style="{StaticResource RoundedGhostButtonStyle}"
+                                Command="{Binding ShowLoginCommand}"
+                                Margin="-8,0,0,18">
+
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="ArrowLeft24"
+                                               Margin="0,0,6,0"
+                                               Foreground="#64748B"/>
+                                <TextBlock Text="Quay lại đăng nhập"
+                                           Foreground="#64748B"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <TextBlock Text="Tạo tài khoản"
+                                   Style="{StaticResource FormTitleStyle}"/>
+
+                        <TextBlock Text="Tạo hồ sơ mới để bắt đầu sử dụng không gian trợ lý số cá nhân."
+                                   Style="{StaticResource FormSubTitleStyle}"
+                                   Margin="0,0,0,20"/>
+
+                        <TextBlock Text="Họ và tên"
+                                   Style="{StaticResource LabelStyle}"/>
+
+                        <Border Style="{StaticResource RoundedInputBorderStyle}">
+                            <ui:TextBox PlaceholderText="Nhập họ và tên"
+                                        Icon="{ui:SymbolIcon Person24}"
+                                        ClearButtonEnabled="True"
+                                        Style="{StaticResource ModernTextBoxStyle}"
+                                        Text="{Binding RegFullName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+
+                        <TextBlock Text="Email"
+                                   Style="{StaticResource LabelStyle}"/>
+
+                        <Border Style="{StaticResource RoundedInputBorderStyle}">
+                            <ui:TextBox PlaceholderText="Nhập email"
+                                        Icon="{ui:SymbolIcon Mail24}"
+                                        ClearButtonEnabled="True"
+                                        Style="{StaticResource ModernTextBoxStyle}"
+                                        Text="{Binding RegEmail, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+
+                        <TextBlock Text="Mật khẩu"
+                                   Style="{StaticResource LabelStyle}"/>
+
+                        <Border Style="{StaticResource RoundedInputBorderStyle}">
+                            <ui:PasswordBox PlaceholderText="Tạo mật khẩu"
+                                            Icon="{ui:SymbolIcon LockClosed24}"
+                                            Style="{StaticResource ModernPasswordBoxStyle}"
+                                            helpers:PasswordBoxHelper.BoundPassword="{Binding RegPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+
+                        <TextBlock Text="Nhập lại mật khẩu"
+                                   Style="{StaticResource LabelStyle}"/>
+
+                        <Border Style="{StaticResource RoundedInputBorderStyle}" Margin="0,0,0,18">
+                            <ui:PasswordBox PlaceholderText="Nhập lại mật khẩu"
+                                            Icon="{ui:SymbolIcon LockShield24}"
+                                            Style="{StaticResource ModernPasswordBoxStyle}"
+                                            helpers:PasswordBoxHelper.BoundPassword="{Binding RegConfirmPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="#EF4444"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Margin="0,0,0,12"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibility}}"/>
+
+                        <Button Style="{StaticResource RoundedPrimaryButtonStyle}"
+                                Command="{Binding RegisterCommand}">
+
+                            <Grid>
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center"
+                                            Visibility="{Binding IsRegistering, Converter={StaticResource InverseBoolToVisibility}}">
+                                    <TextBlock Text="Đăng ký tài khoản"
+                                               FontSize="15"
+                                               FontWeight="Bold"
+                                               Margin="0,0,8,0"/>
+                                    <ui:SymbolIcon Symbol="ArrowRight24"
+                                                   FontSize="18"/>
+                                </StackPanel>
+
+                                <ui:ProgressRing IsIndeterminate="True"
+                                                 Width="20"
+                                                 Height="20"
+                                                 Visibility="{Binding IsRegistering, Converter={StaticResource BoolToVisibility}}"/>
+                            </Grid>
+                        </Button>
+
+                    </StackPanel>
+
+                    <!-- PANEL QUÊN MẬT KHẨU -->
+                    <StackPanel x:Name="pnlForgotPassword"
+                                Margin="36,34"
+                                Opacity="0"
+                                IsHitTestVisible="False">
+
+                        <StackPanel.RenderTransform>
+                            <TranslateTransform x:Name="transForgot" X="450"/>
+                        </StackPanel.RenderTransform>
+
+                        <Button Style="{StaticResource RoundedGhostButtonStyle}"
+                                Command="{Binding ShowLoginCommand}"
+                                Margin="-8,0,0,26">
+
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="ArrowLeft24"
+                                               Margin="0,0,6,0"
+                                               Foreground="#64748B"/>
+                                <TextBlock Text="Quay lại đăng nhập"
+                                           Foreground="#64748B"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Border Width="72"
+                                Height="72"
+                                CornerRadius="24"
+                                Background="#EFF6FF"
+                                BorderBrush="#BBD7FF"
+                                BorderThickness="1"
+                                HorizontalAlignment="Left"
+                                Margin="0,0,0,24">
+
+                            <ui:SymbolIcon Symbol="LockShield24"
+                                           FontSize="34"
+                                           Foreground="#2563EB"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                        </Border>
+
+                        <TextBlock Text="Khôi phục mật khẩu"
+                                   Style="{StaticResource FormTitleStyle}"/>
+
+                        <TextBlock Text="Nhập email đã đăng ký. Hệ thống sẽ gửi mã xác nhận để bạn đặt lại mật khẩu."
+                                   Style="{StaticResource FormSubTitleStyle}"/>
+
+                        <TextBlock Text="Email đăng ký"
+                                   Style="{StaticResource LabelStyle}"/>
+
+                        <Border Style="{StaticResource RoundedInputBorderStyle}" Margin="0,0,0,18">
+                            <ui:TextBox PlaceholderText="Nhập email của bạn"
+                                        Icon="{ui:SymbolIcon Mail24}"
+                                        ClearButtonEnabled="True"
+                                        Style="{StaticResource ModernTextBoxStyle}"
+                                        Text="{Binding ForgotEmail, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="#EF4444"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Margin="0,0,0,12"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibility}}"/>
+
+                        <Button Style="{StaticResource RoundedPrimaryButtonStyle}"
+                                Command="{Binding ForgotPasswordCommand}">
+
+                            <Grid>
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center"
+                                            Visibility="{Binding IsSendingForgot, Converter={StaticResource InverseBoolToVisibility}}">
+                                    <ui:SymbolIcon Symbol="Send24"
+                                                   Margin="0,0,8,0"
+                                                   FontSize="18"/>
+                                    <TextBlock Text="Gửi mã khôi phục"
+                                               FontSize="15"
+                                               FontWeight="Bold"/>
+                                </StackPanel>
+
+                                <ui:ProgressRing IsIndeterminate="True"
+                                                 Width="20"
+                                                 Height="20"
+                                                 Visibility="{Binding IsSendingForgot, Converter={StaticResource BoolToVisibility}}"/>
+                            </Grid>
+                        </Button>
+
+                    </StackPanel>
+
+                </Grid>
+            </Border>
+
         </Grid>
     </Grid>
 </ui:FluentWindow>

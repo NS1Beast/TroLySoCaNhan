@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Icon\google_logo_icon_169090.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.8">
@@ -19,6 +23,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
     <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icon\google_logo_icon_169090.png" />
   </ItemGroup>
 
 </Project>
