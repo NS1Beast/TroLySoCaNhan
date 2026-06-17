@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using TroLySoCaNhan.Models;
-using TroLySoCaNhan.MVVM;
 using BCrypt.Net;
+using TroLySoCaNhan.MVVM;
 
 namespace TroLySoCaNhan.ViewModels
 {
@@ -34,15 +34,16 @@ namespace TroLySoCaNhan.ViewModels
         private bool _isLoggingIn;
         public bool IsLoggingIn { get => _isLoggingIn; set { _isLoggingIn = value; OnPropertyChanged(); } }
 
-        // --- BIẾN ĐĂNG KÝ ---
-        private string _regFullName = string.Empty;
-        public string RegFullName { get => _regFullName; set { _regFullName = value; OnPropertyChanged(); } }
-        private string _regEmail = string.Empty; // Sẽ dùng làm Username
-        public string RegEmail { get => _regEmail; set { _regEmail = value; OnPropertyChanged(); } }
+        // --- BIẾN ĐĂNG KÝ (ĐÃ CẬP NHẬT THEO YÊU CẦU MỚI) ---
+        private string _regUsername = string.Empty;
+        public string RegUsername { get => _regUsername; set { _regUsername = value; OnPropertyChanged(); } }
+
         private string _regPassword = string.Empty;
         public string RegPassword { get => _regPassword; set { _regPassword = value; OnPropertyChanged(); } }
+
         private string _regConfirmPassword = string.Empty;
         public string RegConfirmPassword { get => _regConfirmPassword; set { _regConfirmPassword = value; OnPropertyChanged(); } }
+
         private bool _isRegistering;
         public bool IsRegistering { get => _isRegistering; set { _isRegistering = value; OnPropertyChanged(); } }
 
@@ -52,7 +53,7 @@ namespace TroLySoCaNhan.ViewModels
         private bool _isSendingForgot;
         public bool IsSendingForgot { get => _isSendingForgot; set { _isSendingForgot = value; OnPropertyChanged(); } }
 
-        // --- LỆNH NÚT BẤM (COMMANDS) ---
+        // --- LỆNH NÚT BẤM ---
         public ICommand ShowLoginCommand { get; }
         public ICommand ShowRegisterCommand { get; }
         public ICommand ShowForgotCommand { get; }
@@ -84,11 +85,9 @@ namespace TroLySoCaNhan.ViewModels
 
             try
             {
-                // Truy vấn Database
                 using var db = new TroLySoCaNhanContext();
                 var user = db.NguoiDungs.FirstOrDefault(u => u.TenDangNhap == Username || u.Email == Username);
 
-                // Giả lập chút delay để UI quay vòng vòng nhìn cho xịn
                 await Task.Delay(800);
 
                 if (user == null || string.IsNullOrEmpty(user.MatKhauHash))
@@ -103,14 +102,12 @@ namespace TroLySoCaNhan.ViewModels
                     return;
                 }
 
-                // Verify mật khẩu băm
                 if (!BCrypt.Net.BCrypt.Verify(Password, user.MatKhauHash))
                 {
                     ErrorMessage = "Sai mật khẩu. Vui lòng thử lại.";
                     return;
                 }
 
-                // Thành công -> Bắn event để form Login.xaml.cs nhảy trang
                 LoginSucceeded?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
@@ -125,9 +122,9 @@ namespace TroLySoCaNhan.ViewModels
 
         private async Task DoRegisterAsync()
         {
-            if (string.IsNullOrWhiteSpace(RegFullName) || string.IsNullOrWhiteSpace(RegEmail) || string.IsNullOrWhiteSpace(RegPassword))
+            if (string.IsNullOrWhiteSpace(RegUsername) || string.IsNullOrWhiteSpace(RegPassword))
             {
-                ErrorMessage = "Vui lòng điền đủ thông tin.";
+                ErrorMessage = "Vui lòng điền đủ Tên đăng nhập và Mật khẩu.";
                 return;
             }
 
@@ -144,27 +141,50 @@ namespace TroLySoCaNhan.ViewModels
             {
                 using var db = new TroLySoCaNhanContext();
 
-                // Kiểm tra xem Username (hiện đang nhập ở ô Email) đã tồn tại chưa
-                if (db.NguoiDungs.Any(u => u.TenDangNhap == RegEmail))
+                // 1. Kiểm tra xem Username đã tồn tại chưa
+                if (db.NguoiDungs.Any(u => u.TenDangNhap == RegUsername))
                 {
                     ErrorMessage = "Tên đăng nhập này đã có người sử dụng.";
                     return;
                 }
 
-                await Task.Delay(1000); // Fake delay cho mượt UI
+                await Task.Delay(800);
 
-                // Tạo 1 email giả nếu họ không nhập dạng email thật (để qua ải DB NOT NULL)
-                string realEmail = RegEmail.Contains("@") ? RegEmail : $"{RegEmail}@no-email.local";
+                // 2. THUẬT TOÁN TẠO EMAIL MẪU TỰ TĂNG
+                int count = db.NguoiDungs.Count() + 1;
+                string dummyEmail = $"useremail{count}@gmail.com";
+                while (db.NguoiDungs.Any(u => u.Email == dummyEmail))
+                {
+                    count++;
+                    dummyEmail = $"useremail{count}@gmail.com";
+                }
 
+                // 3. THUẬT TOÁN TẠO MÃ NGẪU NHIÊN DUY NHẤT (MaNgauNhien)
+                string newUid = "";
+                bool isUniqueUid = false;
+                while (!isUniqueUid)
+                {
+                    // Lấy 6 ký tự ngẫu nhiên (chữ HOA + số)
+                    string randomPart = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
+                    newUid = $"UID-{randomPart}";
+
+                    // Kiểm tra dưới database xem mã này đã có ai xài chưa
+                    if (!db.NguoiDungs.Any(u => u.MaNgauNhien == newUid))
+                    {
+                        isUniqueUid = true; // Nếu chưa có ai xài thì thoát vòng lặp, lấy mã này
+                    }
+                }
+
+                // 4. THÊM MỚI VÀO DATABASE
                 var newUser = new NguoiDung
                 {
                     Id = Guid.NewGuid(),
-                    TenDangNhap = RegEmail, // Dùng giá trị họ nhập làm Username
-                    TenHienThi = RegFullName,
-                    Email = realEmail,
-                    MatKhauHash = BCrypt.Net.BCrypt.HashPassword(RegPassword), // BĂM MẬT KHẨU
-                    MaNgauNhien = $"UID-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}", // Khởi tạo ID ngẫu nhiên
-                    VaiTro = 1,
+                    TenDangNhap = RegUsername,
+                    TenHienThi = RegUsername,
+                    Email = dummyEmail,
+                    MatKhauHash = BCrypt.Net.BCrypt.HashPassword(RegPassword),
+                    MaNgauNhien = newUid, // <-- Sử dụng mã UID độc nhất vừa sinh ra
+                    VaiTro = (byte)1, // Ép kiểu byte cho TINYINT của SQL
                     TrangThai = true,
                     SoDuVi = 0,
                     DungLuongToiDa = 5368709120, // 5GB mặc định
@@ -179,11 +199,16 @@ namespace TroLySoCaNhan.ViewModels
                 // Đăng ký xong tự nhảy về form đăng nhập
                 ErrorMessage = "Tạo tài khoản thành công! Hãy đăng nhập.";
                 ActivePanel = "Login";
-                Username = RegEmail; // Gắn sẵn tên vừa tạo vào ô đăng nhập
+                Username = RegUsername;
+
+                // Reset ô password cho an toàn
+                RegPassword = string.Empty;
+                RegConfirmPassword = string.Empty;
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Lỗi tạo tài khoản: " + ex.Message;
+                // Gọi InnerException để lấy lỗi sâu nhất từ SQL Server (nếu có)
+                ErrorMessage = "Lỗi tạo tài khoản: " + (ex.InnerException?.Message ?? ex.Message);
             }
             finally
             {
@@ -207,17 +232,16 @@ namespace TroLySoCaNhan.ViewModels
                 using var db = new TroLySoCaNhanContext();
                 var user = db.NguoiDungs.FirstOrDefault(u => u.Email == ForgotEmail);
 
-                await Task.Delay(1200); // Fake gửi email
+                await Task.Delay(1200);
 
-                // Kiểm tra xem email có phải email giả không
-                if (user == null || user.Email.EndsWith("@no-email.local"))
+                // NGĂN CHẶN KHÔI PHỤC BẰNG EMAIL GIẢ LẬP
+                if (user == null || user.Email.StartsWith("useremail") && user.Email.EndsWith("@gmail.com"))
                 {
-                    ErrorMessage = "Tài khoản của bạn chưa liên kết Email hợp lệ để khôi phục.";
+                    ErrorMessage = "Tài khoản của bạn chưa cập nhật Email bảo mật. Vui lòng liên hệ Admin.";
                     return;
                 }
 
-                // TODO: Code gửi Email thật bằng SmtpClient ở đây
-
+                // TODO: Gọi dịch vụ gửi Email thật ở đây
                 ErrorMessage = "Mã khôi phục đã được gửi vào Email của bạn!";
                 ActivePanel = "Login";
             }

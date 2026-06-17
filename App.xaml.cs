@@ -11,8 +11,6 @@ namespace TroLySoCaNhan
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            // Mở cửa sổ Login đầu tiên
             var loginWindow = new Login();
             loginWindow.Show();
         }

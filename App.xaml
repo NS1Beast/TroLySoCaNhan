@@ -9,8 +9,6 @@
                 <ui:ControlsDictionary />
                 <ui:ThemesDictionary />
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- Converters toàn cục cho DataBinding MVVM -->
             <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
             <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVisibility" />
             <conv:StringToVisibilityConverter x:Key="StringToVisibility" />

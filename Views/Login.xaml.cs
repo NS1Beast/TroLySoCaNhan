@@ -168,5 +168,21 @@ namespace TroLySoCaNhan.Views
             dashboard.Show();
             this.Close();
         }
+        private void txtRegPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is LoginViewModel vm && sender is PasswordBox passBox)
+            {
+                vm.RegPassword = passBox.Password;
+            }
+        }
+
+        // Sự kiện lấy mật khẩu xác nhận lúc Đăng ký
+        private void txtRegConfirmPassword_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is LoginViewModel vm && sender is PasswordBox passBox)
+            {
+                vm.RegConfirmPassword = passBox.Password;
+            }
+        }
     }
 }
