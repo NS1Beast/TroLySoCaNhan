@@ -333,7 +333,7 @@
                                 <Separator Grid.Column="2" VerticalAlignment="Center" Margin="14,0,0,0" Background="#D7E4F7"/>
                             </Grid>
 
-                            <Button Style="{StaticResource RoundedSecondaryButtonStyle}" Margin="0,0,0,24">
+                            <Button Style="{StaticResource RoundedSecondaryButtonStyle}" Margin="0,0,0,24" Command="{Binding LoginWithGoogleCommand}">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Image Source="pack://application:,,,/Icon/google_logo_icon_169090.png" Width="20" Height="20" Stretch="Uniform" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                     <TextBlock Text="Đăng nhập qua Google" Foreground="#0F172A" FontWeight="SemiBold" VerticalAlignment="Center"/>

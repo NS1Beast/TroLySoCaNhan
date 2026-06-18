@@ -19,9 +19,6 @@
                  TextOptions.TextFormattingMode="Display"
                  TextOptions.TextRenderingMode="ClearType">
 
-    <ui:FluentWindow.DataContext>
-        <vm:UpgradeViewModel />
-    </ui:FluentWindow.DataContext>
 
     <ui:FluentWindow.Resources>
 

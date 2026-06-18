@@ -7,12 +7,14 @@ using System.Windows.Input;
 using TroLySoCaNhan.Models;
 using BCrypt.Net;
 using TroLySoCaNhan.MVVM;
+using Microsoft.EntityFrameworkCore;
+using TroLySoCaNhan.Services;
 
 namespace TroLySoCaNhan.ViewModels
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
-        public event EventHandler? LoginSucceeded;
+        public event EventHandler<NguoiDung>? LoginSucceeded;
 
         // --- CÁC BIẾN GIAO DIỆN ---
         private string _activePanel = "Login";
@@ -34,7 +36,7 @@ namespace TroLySoCaNhan.ViewModels
         private bool _isLoggingIn;
         public bool IsLoggingIn { get => _isLoggingIn; set { _isLoggingIn = value; OnPropertyChanged(); } }
 
-        // --- BIẾN ĐĂNG KÝ (ĐÃ CẬP NHẬT THEO YÊU CẦU MỚI) ---
+        // --- BIẾN ĐĂNG KÝ ---
         private string _regUsername = string.Empty;
         public string RegUsername { get => _regUsername; set { _regUsername = value; OnPropertyChanged(); } }
 
@@ -60,6 +62,7 @@ namespace TroLySoCaNhan.ViewModels
         public ICommand LoginCommand { get; }
         public ICommand RegisterCommand { get; }
         public ICommand ForgotPasswordCommand { get; }
+        public ICommand LoginWithGoogleCommand { get; }
 
         public LoginViewModel()
         {
@@ -70,10 +73,13 @@ namespace TroLySoCaNhan.ViewModels
             LoginCommand = new RelayCommand(async _ => await DoLoginAsync());
             RegisterCommand = new RelayCommand(async _ => await DoRegisterAsync());
             ForgotPasswordCommand = new RelayCommand(async _ => await DoForgotAsync());
+            LoginWithGoogleCommand = new RelayCommand(async _ => await DoLoginWithGoogleAsync());
         }
 
         private async Task DoLoginAsync()
         {
+            if (IsLoggingIn) return;
+
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
                 ErrorMessage = "Vui lòng nhập đầy đủ thông tin.";
@@ -85,10 +91,23 @@ namespace TroLySoCaNhan.ViewModels
 
             try
             {
-                using var db = new TroLySoCaNhanContext();
-                var user = db.NguoiDungs.FirstOrDefault(u => u.TenDangNhap == Username || u.Email == Username);
+                ErrorMessage = "Đang kết nối cơ sở dữ liệu...";
 
-                await Task.Delay(800);
+                NguoiDung? user = await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+
+                    // Test kết nối trước để nếu lỗi thì báo rõ
+                    if (!db.Database.CanConnect())
+                    {
+                        throw new Exception("Không kết nối được database. Kiểm tra connection string / SQL Server / tên database.");
+                    }
+
+                    return db.NguoiDungs
+                        .FirstOrDefault(u => u.TenDangNhap == Username || u.Email == Username);
+                });
+
+                ErrorMessage = "Đã kết nối database. Đang kiểm tra tài khoản...";
 
                 if (user == null || string.IsNullOrEmpty(user.MatKhauHash))
                 {
@@ -102,24 +121,151 @@ namespace TroLySoCaNhan.ViewModels
                     return;
                 }
 
-                if (!BCrypt.Net.BCrypt.Verify(Password, user.MatKhauHash))
+                ErrorMessage = "Đang kiểm tra mật khẩu...";
+
+                bool isValidPassword = await Task.Run(() =>
+                {
+                    return BCrypt.Net.BCrypt.Verify(Password, user.MatKhauHash);
+                });
+
+                if (!isValidPassword)
                 {
                     ErrorMessage = "Sai mật khẩu. Vui lòng thử lại.";
                     return;
                 }
 
-                LoginSucceeded?.Invoke(this, EventArgs.Empty);
+                ErrorMessage = "Đăng nhập thành công. Đang mở Dashboard...";
+
+                // Tắt loading trước khi chuyển màn
+                IsLoggingIn = false;
+
+                LoginSucceeded?.Invoke(this, user);
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Lỗi kết nối máy chủ: " + ex.Message;
+                ErrorMessage = "Lỗi đăng nhập: " + (ex.InnerException?.Message ?? ex.Message);
             }
             finally
             {
                 IsLoggingIn = false;
             }
         }
+        private async Task DoLoginWithGoogleAsync()
+        {
+            if (IsLoggingIn || IsRegistering) return;
 
+            ErrorMessage = "";
+            IsLoggingIn = true; // Hiện vòng xoay Loading ở nút đăng nhập
+
+            try
+            {
+                // 1. Gọi Dịch vụ Google để lấy Email & Tên
+                var googleAuth = new TroLySoCaNhan.Models.GoogleAuthService();
+                var userInfo = await googleAuth.LoginAndGetUserInfoAsync();
+
+                if (userInfo == null)
+                {
+                    ErrorMessage = "Đăng nhập Google thất bại hoặc bị hủy.";
+                    return;
+                }
+
+                string email = userInfo.Value.Email;
+                string name = userInfo.Value.Name;
+
+                ErrorMessage = "Đang đồng bộ dữ liệu hệ thống...";
+
+                // 2. Xử lý Logic Database (Đăng ký mới hoặc Đăng nhập)
+                NguoiDung? loggedInUser = await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    var existingUser = db.NguoiDungs.FirstOrDefault(u => u.Email == email);
+
+                    if (existingUser != null)
+                    {
+                        // TRƯỜNG HỢP A: ĐÃ TỒN TẠI TÀI KHOẢN (ĐĂNG NHẬP)
+                        if (existingUser.TrangThai == false) throw new Exception("Tài khoản của bạn đã bị khóa.");
+
+                        // Kiểm tra xem đã liên kết chưa, chưa thì thêm vào bảng TaiKhoanLienKet
+                        bool isLinked = db.TaiKhoanLienKets.Any(tk => tk.MaNguoiDung == existingUser.Id && tk.NenTang == "Google");
+                        if (!isLinked)
+                        {
+                            db.TaiKhoanLienKets.Add(new TaiKhoanLienKet
+                            {
+                                Id = Guid.NewGuid(),
+                                MaNguoiDung = existingUser.Id,
+                                NenTang = "Google",
+                                ThongTinDangNhap = email,
+                                TrangThai = true,
+                                NgayLienKet = DateTime.Now
+                            });
+                            db.SaveChanges();
+                        }
+                        return existingUser;
+                    }
+                    else
+                    {
+                        // TRƯỜNG HỢP B: NGƯỜI DÙNG MỚI TINH -> TỰ ĐỘNG ĐĂNG KÝ VÀ CẤP KHÓA E2EE
+                        string newUid = "";
+                        bool isUniqueUid = false;
+                        while (!isUniqueUid)
+                        {
+                            newUid = "UID-" + Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
+                            if (!db.NguoiDungs.Any(u => u.MaNgauNhien == newUid)) isUniqueUid = true;
+                        }
+
+                        // TẠO CẶP KHÓA BẢO MẬT (Giống y hệt đăng ký thường)
+                        var keyPair = TroLySoCaNhan.Services.CryptoService.GenerateKeyPair();
+                        TroLySoCaNhan.Services.CryptoService.SaveAndProtectPrivateKey(newUid, keyPair.PrivateKey);
+
+                        // Tạo User mới
+                        var newUser = new NguoiDung
+                        {
+                            Id = Guid.NewGuid(),
+                            TenDangNhap = newUid, // Dùng tạm UID làm Tên đăng nhập để khỏi trùng
+                            TenHienThi = name,
+                            Email = email,
+                            MatKhauHash = null, // Google Login thì không cần mật khẩu hệ thống
+                            MaNgauNhien = newUid,
+                            KhoaCongKhaiPgp = keyPair.PublicKey,
+                            VaiTro = 1,
+                            TrangThai = true,
+                            SoDuVi = 0,
+                            DungLuongToiDa = 5368709120,
+                            LuotAisuDung = 100,
+                            NgayTao = DateTime.Now,
+                            NgayCapNhat = DateTime.Now
+                        };
+                        db.NguoiDungs.Add(newUser);
+
+                        // Tạo luôn liên kết tài khoản
+                        db.TaiKhoanLienKets.Add(new TaiKhoanLienKet
+                        {
+                            Id = Guid.NewGuid(),
+                            MaNguoiDung = newUser.Id,
+                            NenTang = "Google",
+                            ThongTinDangNhap = email,
+                            TrangThai = true,
+                            NgayLienKet = DateTime.Now
+                        });
+
+                        db.SaveChanges();
+                        return newUser;
+                    }
+                });
+
+                // 3. Chuyển sang màn hình Dashboard
+                IsLoggingIn = false;
+                LoginSucceeded?.Invoke(this, loggedInUser);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "Lỗi xác thực Google: " + (ex.InnerException?.Message ?? ex.Message);
+            }
+            finally
+            {
+                IsLoggingIn = false;
+            }
+        }
         private async Task DoRegisterAsync()
         {
             if (string.IsNullOrWhiteSpace(RegUsername) || string.IsNullOrWhiteSpace(RegPassword))
@@ -139,76 +285,74 @@ namespace TroLySoCaNhan.ViewModels
 
             try
             {
-                using var db = new TroLySoCaNhanContext();
-
-                // 1. Kiểm tra xem Username đã tồn tại chưa
-                if (db.NguoiDungs.Any(u => u.TenDangNhap == RegUsername))
+                // Đẩy toàn bộ Logic thêm mới Database và băm BCrypt xuống Luồng ngầm
+                await Task.Run(() =>
                 {
-                    ErrorMessage = "Tên đăng nhập này đã có người sử dụng.";
-                    return;
-                }
+                    using var db = new TroLySoCaNhanContext();
 
-                await Task.Delay(800);
-
-                // 2. THUẬT TOÁN TẠO EMAIL MẪU TỰ TĂNG
-                int count = db.NguoiDungs.Count() + 1;
-                string dummyEmail = $"useremail{count}@gmail.com";
-                while (db.NguoiDungs.Any(u => u.Email == dummyEmail))
-                {
-                    count++;
-                    dummyEmail = $"useremail{count}@gmail.com";
-                }
-
-                // 3. THUẬT TOÁN TẠO MÃ NGẪU NHIÊN DUY NHẤT (MaNgauNhien)
-                string newUid = "";
-                bool isUniqueUid = false;
-                while (!isUniqueUid)
-                {
-                    // Lấy 6 ký tự ngẫu nhiên (chữ HOA + số)
-                    string randomPart = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
-                    newUid = $"UID-{randomPart}";
-
-                    // Kiểm tra dưới database xem mã này đã có ai xài chưa
-                    if (!db.NguoiDungs.Any(u => u.MaNgauNhien == newUid))
+                    if (db.NguoiDungs.Any(u => u.TenDangNhap == RegUsername))
                     {
-                        isUniqueUid = true; // Nếu chưa có ai xài thì thoát vòng lặp, lấy mã này
+                        throw new Exception("Tên đăng nhập này đã có người sử dụng.");
                     }
-                }
 
-                // 4. THÊM MỚI VÀO DATABASE
-                var newUser = new NguoiDung
-                {
-                    Id = Guid.NewGuid(),
-                    TenDangNhap = RegUsername,
-                    TenHienThi = RegUsername,
-                    Email = dummyEmail,
-                    MatKhauHash = BCrypt.Net.BCrypt.HashPassword(RegPassword),
-                    MaNgauNhien = newUid, // <-- Sử dụng mã UID độc nhất vừa sinh ra
-                    VaiTro = (byte)1, // Ép kiểu byte cho TINYINT của SQL
-                    TrangThai = true,
-                    SoDuVi = 0,
-                    DungLuongToiDa = 5368709120, // 5GB mặc định
-                    LuotAisuDung = 100,
-                    NgayTao = DateTime.Now,
-                    NgayCapNhat = DateTime.Now
-                };
+                    int count = db.NguoiDungs.Count() + 1;
+                    string dummyEmail = $"useremail{count}@gmail.com";
+                    while (db.NguoiDungs.Any(u => u.Email == dummyEmail))
+                    {
+                        count++;
+                        dummyEmail = $"useremail{count}@gmail.com";
+                    }
 
-                db.NguoiDungs.Add(newUser);
-                await db.SaveChangesAsync();
+                    string newUid = "";
+                    bool isUniqueUid = false;
+                    while (!isUniqueUid)
+                    {
+                        string randomPart = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
+                        newUid = $"UID-{randomPart}";
 
-                // Đăng ký xong tự nhảy về form đăng nhập
+                        if (!db.NguoiDungs.Any(u => u.MaNgauNhien == newUid))
+                        {
+                            isUniqueUid = true;
+                        }
+                    }
+                    // 1. Tạo cặp khóa
+                    var keyPair = TroLySoCaNhan.Services.CryptoService.GenerateKeyPair();
+                    // 2. Lưu Private Key xuống máy
+                    TroLySoCaNhan.Services.CryptoService.SaveAndProtectPrivateKey(newUid, keyPair.PrivateKey);
+
+                    // 3. Gán Public Key vào Object
+                    var newUser = new NguoiDung
+                    {
+                        Id = Guid.NewGuid(),
+                        TenDangNhap = RegUsername,
+                        TenHienThi = RegUsername,
+                        Email = dummyEmail,
+                        MatKhauHash = BCrypt.Net.BCrypt.HashPassword(RegPassword),
+                        MaNgauNhien = newUid,
+                        KhoaCongKhaiPgp = keyPair.PublicKey,
+                        VaiTro = (byte)1,
+                        TrangThai = true,
+                        SoDuVi = 0,
+                        DungLuongToiDa = 5368709120,
+                        LuotAisuDung = 100,
+                        NgayTao = DateTime.Now,
+                        NgayCapNhat = DateTime.Now
+                    };
+
+                    db.NguoiDungs.Add(newUser);
+                    db.SaveChanges(); // Lưu vào Database
+                });
+
                 ErrorMessage = "Tạo tài khoản thành công! Hãy đăng nhập.";
                 ActivePanel = "Login";
                 Username = RegUsername;
 
-                // Reset ô password cho an toàn
                 RegPassword = string.Empty;
                 RegConfirmPassword = string.Empty;
             }
             catch (Exception ex)
             {
-                // Gọi InnerException để lấy lỗi sâu nhất từ SQL Server (nếu có)
-                ErrorMessage = "Lỗi tạo tài khoản: " + (ex.InnerException?.Message ?? ex.Message);
+                ErrorMessage = "Lỗi: " + (ex.InnerException?.Message ?? ex.Message);
             }
             finally
             {
@@ -229,25 +373,26 @@ namespace TroLySoCaNhan.ViewModels
 
             try
             {
-                using var db = new TroLySoCaNhanContext();
-                var user = db.NguoiDungs.FirstOrDefault(u => u.Email == ForgotEmail);
+                var user = await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    return db.NguoiDungs.FirstOrDefault(u => u.Email == ForgotEmail);
+                });
 
                 await Task.Delay(1200);
 
-                // NGĂN CHẶN KHÔI PHỤC BẰNG EMAIL GIẢ LẬP
-                if (user == null || user.Email.StartsWith("useremail") && user.Email.EndsWith("@gmail.com"))
+                if (user == null || (user.Email.StartsWith("useremail") && user.Email.EndsWith("@gmail.com")))
                 {
                     ErrorMessage = "Tài khoản của bạn chưa cập nhật Email bảo mật. Vui lòng liên hệ Admin.";
                     return;
                 }
 
-                // TODO: Gọi dịch vụ gửi Email thật ở đây
                 ErrorMessage = "Mã khôi phục đã được gửi vào Email của bạn!";
                 ActivePanel = "Login";
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Lỗi xử lý: " + ex.Message;
+                ErrorMessage = "Lỗi xử lý: " + (ex.InnerException?.Message ?? ex.Message);
             }
             finally
             {

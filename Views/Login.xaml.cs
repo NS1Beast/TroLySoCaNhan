@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using TroLySoCaNhan.Models;
 using TroLySoCaNhan.ViewModels;
 using Wpf.Ui.Controls;
 
@@ -150,6 +151,7 @@ namespace TroLySoCaNhan.Views
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
+            if (transBranding == null || transCard == null) return;
             // Hiệu ứng Parallax (Di chuyển các khối nhẹ theo chuột)
             Point mousePos = e.GetPosition(this);
             double centerX = this.ActualWidth / 2;
@@ -162,9 +164,9 @@ namespace TroLySoCaNhan.Views
         // ==========================================
         // 4. CHUYỂN SANG DASHBOARD KHI LOGIN THÀNH CÔNG
         // ==========================================
-        private void OnLoginSucceeded(object? sender, System.EventArgs e)
+        private void OnLoginSucceeded(object? sender, NguoiDung userDb)
         {
-            var dashboard = new DashBoard();
+            var dashboard = new DashBoard(userDb);
             dashboard.Show();
             this.Close();
         }

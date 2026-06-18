@@ -6,45 +6,31 @@
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:local="clr-namespace:TroLySoCaNhan.Views"
                  xmlns:vm="clr-namespace:TroLySoCaNhan.ViewModels"
-                 xmlns:models="clr-namespace:TroLySoCaNhan.Models"
                  mc:Ignorable="d"
                  Title="Dashboard - Trợ lý số cá nhân"
-                 Height="820"
-                 Width="1320"
-                 MinHeight="760"
-                 MinWidth="1180"
+                 Height="820" Width="1320"
+                 MinHeight="760" MinWidth="1180"
                  WindowBackdropType="Mica"
                  ExtendsContentIntoTitleBar="True"
                  WindowStartupLocation="CenterScreen"
                  TextOptions.TextFormattingMode="Display"
                  TextOptions.TextRenderingMode="ClearType">
 
-    <ui:FluentWindow.DataContext>
-        <vm:DashboardViewModel />
-    </ui:FluentWindow.DataContext>
-
     <ui:FluentWindow.Resources>
-
-        <!-- =========================
-             MÀU CHỦ ĐẠO
-        ========================== -->
         <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A"/>
         <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
         <SolidColorBrush x:Key="TextMutedBrush" Color="#94A3B8"/>
 
         <SolidColorBrush x:Key="BluePrimaryBrush" Color="#2563EB"/>
-        <SolidColorBrush x:Key="BlueDarkBrush" Color="#1D4ED8"/>
         <SolidColorBrush x:Key="BlueSoftBrush" Color="#EFF6FF"/>
         <SolidColorBrush x:Key="BlueBorderBrush" Color="#CFE3FF"/>
 
         <SolidColorBrush x:Key="SurfaceBrush" Color="#EEFFFFFF"/>
-        <SolidColorBrush x:Key="SurfaceSoftBrush" Color="#F8FAFC"/>
         <SolidColorBrush x:Key="InputBackgroundBrush" Color="#F8FAFC"/>
         <SolidColorBrush x:Key="InputBorderBrush" Color="#D8E6FF"/>
 
-        <!-- =========================
-             TEXT STYLE
-        ========================== -->
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
         <Style x:Key="PageTitleStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="FontSize" Value="28"/>
@@ -69,22 +55,15 @@
             <Setter Property="FontSize" Value="13"/>
         </Style>
 
-        <!-- =========================
-             BORDER STYLE
-        ========================== -->
         <Style x:Key="GlassCardStyle" TargetType="Border">
             <Setter Property="CornerRadius" Value="26"/>
             <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BlueBorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="22"/>
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="34"
-                                      ShadowDepth="10"
-                                      Opacity="0.13"
-                                      Color="#2563EB"/>
+                    <DropShadowEffect BlurRadius="34" ShadowDepth="10" Opacity="0.13" Color="#2563EB"/>
                 </Setter.Value>
             </Setter>
         </Style>
@@ -95,14 +74,6 @@
             <Setter Property="BorderBrush" Value="#D8E6FF"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="18"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="22"
-                                      ShadowDepth="6"
-                                      Opacity="0.08"
-                                      Color="#2563EB"/>
-                </Setter.Value>
-            </Setter>
         </Style>
 
         <Style x:Key="RoundedSearchBorderStyle" TargetType="Border">
@@ -113,9 +84,6 @@
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
 
-        <!-- =========================
-             INPUT STYLE
-        ========================== -->
         <Style x:Key="SearchTextBoxStyle" TargetType="{x:Type ui:TextBox}">
             <Setter Property="Height" Value="44"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -126,10 +94,6 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
-        <!-- =========================
-             BUTTON TEMPLATE BO TRÒN
-             Dùng Button thường để tránh lỗi CornerRadius của ui:Button
-        ========================== -->
         <Style x:Key="TopNavButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Height" Value="38"/>
             <Setter Property="MinWidth" Value="42"/>
@@ -144,24 +108,13 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="15">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"/>
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="15">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                         </Border>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
                                 <Setter TargetName="Root" Property="BorderBrush" Value="#BFDBFE"/>
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#DBEAFE"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -183,28 +136,12 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"/>
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="16">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                         </Border>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Root" Property="Background" Value="#1D4ED8"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="#1D4ED8"/>
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#1E40AF"/>
-                            </Trigger>
-
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Root" Property="Opacity" Value="0.55"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -226,24 +163,13 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"/>
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="16">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                         </Border>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
                                 <Setter TargetName="Root" Property="BorderBrush" Value="#BFDBFE"/>
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#DBEAFE"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -254,7 +180,6 @@
         <Style x:Key="MiniIconButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Width" Value="34"/>
             <Setter Property="Height" Value="34"/>
-            <Setter Property="Padding" Value="0"/>
             <Setter Property="Background" Value="#FFFFFF"/>
             <Setter Property="BorderBrush" Value="#D8E6FF"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -262,23 +187,12 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="12">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                        <Border x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="#BFDBFE"/>
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#DBEAFE"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -286,9 +200,6 @@
             </Setter>
         </Style>
 
-        <!-- =========================
-             DATAGRID STYLE
-        ========================== -->
         <Style TargetType="DataGrid">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -320,14 +231,9 @@
         <Style TargetType="DataGridRow">
             <Setter Property="Height" Value="46"/>
         </Style>
-
     </ui:FluentWindow.Resources>
 
     <Grid>
-
-        <!-- =========================
-             NỀN GRADIENT TRẮNG XANH
-        ========================== -->
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#FFFFFF" Offset="0.00"/>
@@ -337,13 +243,7 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <!-- Blob nền trái -->
-        <Ellipse Width="480"
-                 Height="480"
-                 HorizontalAlignment="Left"
-                 VerticalAlignment="Top"
-                 Margin="-190,-190,0,0"
-                 Opacity="0.48">
+        <Ellipse Width="480" Height="480" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-190,-190,0,0" Opacity="0.48">
             <Ellipse.Fill>
                 <RadialGradientBrush>
                     <GradientStop Color="#60A5FA" Offset="0"/>
@@ -356,13 +256,7 @@
             </Ellipse.Effect>
         </Ellipse>
 
-        <!-- Blob nền phải -->
-        <Ellipse Width="560"
-                 Height="560"
-                 HorizontalAlignment="Right"
-                 VerticalAlignment="Bottom"
-                 Margin="0,0,-230,-250"
-                 Opacity="0.42">
+        <Ellipse Width="560" Height="560" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,-230,-250" Opacity="0.42">
             <Ellipse.Fill>
                 <RadialGradientBrush>
                     <GradientStop Color="#93C5FD" Offset="0"/>
@@ -381,98 +275,48 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- =========================
-                 TITLE BAR + BUTTON TRÊN GÓC
-            ========================== -->
-            <ui:TitleBar Grid.Row="0"
-                         Title="Trợ Lý Số Cá Nhân"
-                         Foreground="#0F172A"
-                         Background="Transparent">
+            <ui:TitleBar Grid.Row="0" Title="Trợ Lý Số Cá Nhân" Foreground="#0F172A" Background="Transparent">
                 <ui:TitleBar.Icon>
                     <ui:SymbolIcon Symbol="Bot24" Foreground="#2563EB"/>
                 </ui:TitleBar.Icon>
 
                 <ui:TitleBar.Header>
                     <StackPanel Orientation="Horizontal" Margin="0,0,18,0">
-
-                        <Button Style="{StaticResource TopNavButtonStyle}"
-                                Command="{Binding OpenProfileCommand}"
-                                ToolTip="Hồ sơ"
-                                Margin="0,0,8,0">
+                        <Button Style="{StaticResource TopNavButtonStyle}" Command="{Binding OpenProfileCommand}" ToolTip="Hồ sơ" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="Person24"
-                                               Foreground="#2563EB"
-                                               FontSize="18"
-                                               Margin="0,0,6,0"/>
-                                <TextBlock Text="Hồ sơ"
-                                           Foreground="#0F172A"
-                                           VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="Person24" Foreground="#2563EB" FontSize="18" Margin="0,0,6,0"/>
+                                <TextBlock Text="Hồ sơ" Foreground="#0F172A" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-
-                        <Button Style="{StaticResource TopNavButtonStyle}"
-        Command="{Binding OpenStorageCommand}"
-        ToolTip="Dữ liệu"
-        Margin="0,0,8,0">
+                        <Button Style="{StaticResource TopNavButtonStyle}" Command="{Binding OpenStorageCommand}" ToolTip="Dữ liệu" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="ArrowUpload24"
-                       Foreground="#2563EB"
-                       FontSize="18"
-                       Margin="0,0,6,0"/>
-                                <TextBlock Text="Dữ liệu"
-                   Foreground="#0F172A"
-                   VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="ArrowUpload24" Foreground="#2563EB" FontSize="18" Margin="0,0,6,0"/>
+                                <TextBlock Text="Dữ liệu" Foreground="#0F172A" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-
-                        <Button Style="{StaticResource TopNavButtonStyle}"
-        Command="{Binding OpenGroupCommand}"
-        ToolTip="Nhóm"
-        Margin="0,0,8,0">
+                        <Button Style="{StaticResource TopNavButtonStyle}" Command="{Binding OpenGroupCommand}" ToolTip="Nhóm" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="People24"
-                       Foreground="#2563EB"
-                       FontSize="18"
-                       Margin="0,0,6,0"/>
-                                <TextBlock Text="Nhóm"
-                   Foreground="#0F172A"
-                   VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="People24" Foreground="#2563EB" FontSize="18" Margin="0,0,6,0"/>
+                                <TextBlock Text="Nhóm" Foreground="#0F172A" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-
-                        <Button Style="{StaticResource TopNavButtonStyle}"
-                                Command="{Binding OpenUpgradeCommand}"
-                                ToolTip="Nâng cấp tài khoản">
+                        <Button Style="{StaticResource TopNavButtonStyle}" Command="{Binding OpenUpgradeCommand}" ToolTip="Nâng cấp tài khoản">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="Star24"
-                                               Foreground="#F59E0B"
-                                               FontSize="18"
-                                               Margin="0,0,6,0"/>
-                                <TextBlock Text="Nâng cấp"
-                                           Foreground="#0F172A"
-                                           VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="Star24" Foreground="#F59E0B" FontSize="18" Margin="0,0,6,0"/>
+                                <TextBlock Text="Nâng cấp" Foreground="#0F172A" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        
-
                     </StackPanel>
                 </ui:TitleBar.Header>
             </ui:TitleBar>
 
-            <!-- =========================
-                 CONTENT
-            ========================== -->
             <Grid Grid.Row="1" Margin="28,20,28,24">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- =========================
-                     HEADER DASHBOARD
-                ========================== -->
                 <Grid Grid.Row="0" Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -480,51 +324,36 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="Dashboard"
-                                   Style="{StaticResource PageTitleStyle}"/>
-
-                        <TextBlock Text="Quản lý tài liệu, upload, OCR, chia sẻ và theo dõi các tác vụ AI trong không gian làm việc số của bạn."
-                                   Style="{StaticResource PageSubTitleStyle}"
-                                   Margin="0,6,0,0"/>
+                        <TextBlock Text="Dashboard" Style="{StaticResource PageTitleStyle}"/>
+                        <TextBlock Text="Quản lý tài liệu, upload, OCR, chia sẻ và theo dõi các tác vụ AI trong không gian làm việc số của bạn." Style="{StaticResource PageSubTitleStyle}" Margin="0,6,0,0"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
 
-                        <Button Style="{StaticResource SecondaryActionButtonStyle}"
-                                Command="{Binding SearchCommand}"
-                                Margin="0,0,10,0">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="Search24"
-                                               Foreground="#2563EB"
-                                               FontSize="18"
-                                               Margin="0,0,7,0"/>
-                                <TextBlock Text="Tìm"
-                                           Foreground="#0F172A"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
+                        <Border Style="{StaticResource RoundedSearchBorderStyle}" Width="280" Margin="0,0,10,0">
+                            <ui:TextBox PlaceholderText="Tìm tên file, hoặc mã ID (Enter)..." 
+                                        Icon="{ui:SymbolIcon Search24}" 
+                                        Style="{StaticResource SearchTextBoxStyle}" 
+                                        Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}">
+                                <ui:TextBox.InputBindings>
+                                    <KeyBinding Key="Return" Command="{Binding SearchCommand}"/>
+                                </ui:TextBox.InputBindings>
+                            </ui:TextBox>
+                        </Border>
+
+                        <Button Style="{StaticResource SecondaryActionButtonStyle}" Command="{Binding SearchCommand}" Margin="0,0,14,0" MinWidth="0" Padding="12,0">
+                            <TextBlock Text="Tìm" Foreground="#0F172A" VerticalAlignment="Center"/>
                         </Button>
 
-                        <Button Style="{StaticResource PrimaryActionButtonStyle}"
-                                Command="{Binding UploadTaiLieuCommand}">
+                        <Button Style="{StaticResource PrimaryActionButtonStyle}" Command="{Binding UploadTaiLieuCommand}">
                             <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="ArrowUpload24"
-                                               Foreground="#FFFFFF"
-                                               FontSize="18"
-                                               Margin="0,0,7,0"/>
-                                <TextBlock Text="Upload tài liệu"
-                                           Foreground="#FFFFFF"
-                                           VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="Add24" Foreground="#FFFFFF" FontSize="18" Margin="0,0,7,0"/>
+                                <TextBlock Text="Thêm tài liệu (Local)" Foreground="#FFFFFF" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-
                     </StackPanel>
                 </Grid>
 
-                <!-- =========================
-                     THỐNG KÊ NHANH
-                ========================== -->
                 <Grid Grid.Row="1" Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -533,70 +362,36 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0"
-                            Style="{StaticResource MiniCardStyle}"
-                            Margin="0,0,12,0">
+                    <Border Grid.Column="0" Style="{StaticResource MiniCardStyle}" Margin="0,0,12,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-
-                            <Border Width="46"
-                                    Height="46"
-                                    CornerRadius="16"
-                                    Background="#EFF6FF"
-                                    Margin="0,0,14,0">
-                                <ui:SymbolIcon Symbol="ArrowUpload24"
-                                               Foreground="#2563EB"
-                                               FontSize="24"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
+                            <Border Width="46" Height="46" CornerRadius="16" Background="#EFF6FF" Margin="0,0,14,0">
+                                <ui:SymbolIcon Symbol="Document24" Foreground="#2563EB" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-
                             <StackPanel Grid.Column="1">
-                                <TextBlock Text="Tổng tài liệu"
-                                           Foreground="#64748B"
-                                           FontSize="13"/>
-                                <TextBlock Foreground="#0F172A"
-                                           FontSize="24"
-                                           FontWeight="Bold"
-                                           Margin="0,4,0,0">
+                                <TextBlock Text="Tổng tài liệu" Foreground="#64748B" FontSize="13"/>
+                                <TextBlock Foreground="#0F172A" FontSize="24" FontWeight="Bold" Margin="0,4,0,0">
                                     <Run Text="{Binding TotalItems, Mode=OneWay}"/>
                                 </TextBlock>
                             </StackPanel>
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="1"
-                            Style="{StaticResource MiniCardStyle}"
-                            Margin="0,0,12,0">
+                    <Border Grid.Column="1" Style="{StaticResource MiniCardStyle}" Margin="0,0,12,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-
-                            <Border Width="46"
-                                    Height="46"
-                                    CornerRadius="16"
-                                    Background="#ECFDF5"
-                                    Margin="0,0,14,0">
-                                <ui:SymbolIcon Symbol="Scan24"
-                                               Foreground="#059669"
-                                               FontSize="24"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
+                            <Border Width="46" Height="46" CornerRadius="16" Background="#ECFDF5" Margin="0,0,14,0">
+                                <ui:SymbolIcon Symbol="Scan24" Foreground="#059669" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-
                             <StackPanel Grid.Column="1">
-                                <TextBlock Text="Tiến độ OCR"
-                                           Foreground="#64748B"
-                                           FontSize="13"/>
-                                <TextBlock Foreground="#0F172A"
-                                           FontSize="24"
-                                           FontWeight="Bold"
-                                           Margin="0,4,0,0">
+                                <TextBlock Text="Tiến độ OCR" Foreground="#64748B" FontSize="13"/>
+                                <TextBlock Foreground="#0F172A" FontSize="24" FontWeight="Bold" Margin="0,4,0,0">
                                     <Run Text="{Binding TiLeHoanThanh, Mode=OneWay}"/>
                                     <Run Text="%"/>
                                 </TextBlock>
@@ -604,91 +399,46 @@
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="2"
-                            Style="{StaticResource MiniCardStyle}"
-                            Margin="0,0,12,0">
+                    <Border Grid.Column="2" Style="{StaticResource MiniCardStyle}" Margin="0,0,12,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-
-                            <Border Width="46"
-                                    Height="46"
-                                    CornerRadius="16"
-                                    Background="#FEF3C7"
-                                    Margin="0,0,14,0">
-                                <ui:SymbolIcon Symbol="Star24"
-                                               Foreground="#D97706"
-                                               FontSize="24"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
+                            <Border Width="46" Height="46" CornerRadius="16" Background="#FEF3C7" Margin="0,0,14,0">
+                                <ui:SymbolIcon Symbol="Star24" Foreground="#D97706" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-
                             <StackPanel Grid.Column="1">
-                                <TextBlock Text="Gói dịch vụ"
-                                           Foreground="#64748B"
-                                           FontSize="13"/>
-                                <TextBlock Text="SaaS"
-                                           Foreground="#0F172A"
-                                           FontSize="24"
-                                           FontWeight="Bold"
-                                           Margin="0,4,0,0"/>
+                                <TextBlock Text="Gói dịch vụ" Foreground="#64748B" FontSize="13"/>
+                                <TextBlock Text="{Binding CurrentUser.Plan}" Foreground="#0F172A" FontSize="24" FontWeight="Bold" Margin="0,4,0,0"/>
                             </StackPanel>
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="3"
-                            Style="{StaticResource MiniCardStyle}">
+                    <Border Grid.Column="3" Style="{StaticResource MiniCardStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-
-                            <Border Width="46"
-                                    Height="46"
-                                    CornerRadius="16"
-                                    Background="#F5F3FF"
-                                    Margin="0,0,14,0">
-                                <ui:SymbolIcon Symbol="Bot24"
-                                               Foreground="#7C3AED"
-                                               FontSize="24"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"/>
+                            <Border Width="46" Height="46" CornerRadius="16" Background="#F5F3FF" Margin="0,0,14,0">
+                                <ui:SymbolIcon Symbol="Bot24" Foreground="#7C3AED" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-
                             <StackPanel Grid.Column="1">
-                                <TextBlock Text="AI tự động hóa"
-                                           Foreground="#64748B"
-                                           FontSize="13"/>
-                                <TextBlock Text="Sẵn sàng"
-                                           Foreground="#0F172A"
-                                           FontSize="22"
-                                           FontWeight="Bold"
-                                           Margin="0,4,0,0"/>
+                                <TextBlock Text="AI tự động hóa" Foreground="#64748B" FontSize="13"/>
+                                <TextBlock Text="Sẵn sàng" Foreground="#0F172A" FontSize="22" FontWeight="Bold" Margin="0,4,0,0"/>
                             </StackPanel>
                         </Grid>
                     </Border>
                 </Grid>
 
-                <!-- =========================
-                     MAIN AREA
-                ========================== -->
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="300"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- =========================
-                         CARD DANH SÁCH TÀI LIỆU
-                    ========================== -->
-                    <Border Grid.Column="0"
-                            Style="{StaticResource GlassCardStyle}"
-                            Padding="20"
-                            Margin="0,0,18,0">
-
+                    <Border Grid.Column="0" Style="{StaticResource GlassCardStyle}" Padding="20" Margin="0,0,18,0">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -696,171 +446,115 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <!-- Thanh tìm kiếm -->
                             <Grid Grid.Row="0" Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="Không gian tài liệu"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-                                    <TextBlock Text="Theo dõi file, phiên bản, trạng thái upload và thao tác nhanh."
-                                               Style="{StaticResource SmallMutedTextStyle}"
-                                               Margin="0,4,0,0"/>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Không gian tài liệu" Style="{StaticResource SectionTitleStyle}"/>
+                                    <TextBlock Text="Theo dõi file, phiên bản, trạng thái upload và thao tác nhanh." Style="{StaticResource SmallMutedTextStyle}" Margin="0,4,0,0"/>
                                 </StackPanel>
 
-                                <Border Grid.Column="1"
-                                        Style="{StaticResource RoundedSearchBorderStyle}"
-                                        Width="330"
-                                        VerticalAlignment="Center">
-                                    <ui:TextBox PlaceholderText="Tìm kiếm tài liệu..."
-                                                Icon="{ui:SymbolIcon Search24}"
-                                                Style="{StaticResource SearchTextBoxStyle}"
-                                                Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"/>
-                                </Border>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Sắp xếp theo:" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="13"/>
+                                    <ComboBox Width="180" Height="40" VerticalAlignment="Center" FontSize="13" Foreground="#0F172A"
+                                              ItemsSource="{Binding SortOptions}" 
+                                              SelectedItem="{Binding SelectedSortOption}">
+                                    </ComboBox>
+                                </StackPanel>
                             </Grid>
 
-                            <!-- OCR progress -->
-                            <Border Grid.Row="1"
-                                    CornerRadius="18"
-                                    Background="#EFF6FF"
-                                    BorderBrush="#BFDBFE"
-                                    BorderThickness="1"
-                                    Padding="14,12"
-                                    Margin="0,0,0,16"
-                                    Visibility="{Binding IsProcessingOcr, Converter={StaticResource BoolToVisibility}}">
+                            <Border Grid.Row="1" CornerRadius="18" Background="#EFF6FF" BorderBrush="#BFDBFE" BorderThickness="1" Padding="14,12" Margin="0,0,0,16" Visibility="{Binding IsProcessingOcr, Converter={StaticResource BoolToVisibility}}">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
-
                                     <DockPanel Grid.Row="0">
                                         <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                                            <ui:SymbolIcon Symbol="Scan24"
-                                                           Foreground="#2563EB"
-                                                           FontSize="20"
-                                                           Margin="0,0,8,0"/>
-                                            <TextBlock Text="Đang xử lý OCR"
-                                                       Foreground="#0F172A"
-                                                       FontWeight="Bold"
-                                                       VerticalAlignment="Center"/>
+                                            <ui:SymbolIcon Symbol="Scan24" Foreground="#2563EB" FontSize="20" Margin="0,0,8,0"/>
+                                            <TextBlock Text="Đang xử lý OCR" Foreground="#0F172A" FontWeight="Bold" VerticalAlignment="Center"/>
                                         </StackPanel>
-
-                                        <TextBlock Text="{Binding OcrStatusMessage}"
-                                                   Foreground="#64748B"
-                                                   HorizontalAlignment="Right"
-                                                   DockPanel.Dock="Right"/>
+                                        <TextBlock Text="{Binding OcrStatusMessage}" Foreground="#64748B" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
                                     </DockPanel>
-
-                                    <ProgressBar Grid.Row="1"
-                                                 Value="{Binding TiLeHoanThanh, Mode=OneWay}"
-                                                 Minimum="0"
-                                                 Maximum="100"
-                                                 Height="8"
-                                                 Margin="0,10,0,0"
-                                                 Foreground="#2563EB"
-                                                 Background="#DBEAFE"/>
+                                    <ProgressBar Grid.Row="1" Value="{Binding TiLeHoanThanh, Mode=OneWay}" Minimum="0" Maximum="100" Height="8" Margin="0,10,0,0" Foreground="#2563EB" Background="#DBEAFE"/>
                                 </Grid>
                             </Border>
 
-                            <!-- DataGrid + loading -->
                             <Grid Grid.Row="2">
-
-                                <Border CornerRadius="20"
-                                        Background="#FFFFFF"
-                                        BorderBrush="#D8E6FF"
-                                        BorderThickness="1"
-                                        ClipToBounds="True">
-
-                                    <DataGrid ItemsSource="{Binding TaiLieus}"
-                                              SelectedItem="{Binding SelectedTaiLieu}"
-                                              AutoGenerateColumns="False"
-                                              IsReadOnly="True"
-                                              HeadersVisibility="Column"
-                                              GridLinesVisibility="Horizontal"
-                                              EnableRowVirtualization="True"
-                                              EnableColumnVirtualization="True"
-                                              VirtualizingPanel.IsVirtualizing="True"
-                                              VirtualizingPanel.VirtualizationMode="Recycling"
-                                              VirtualizingPanel.ScrollUnit="Pixel"
-                                              ScrollViewer.CanContentScroll="True"
-                                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                              RowHeight="46"
-                                              AlternationCount="2">
-
+                                <Border CornerRadius="20" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" ClipToBounds="True">
+                                    <DataGrid ItemsSource="{Binding TaiLieus}" SelectedItem="{Binding SelectedTaiLieu}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" GridLinesVisibility="Horizontal" EnableRowVirtualization="True" EnableColumnVirtualization="True" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Auto" RowHeight="46" AlternationCount="2">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Mã"
-                                                                Binding="{Binding Id}"
-                                                                Width="115"/>
-
-                                            <DataGridTextColumn Header="Tên tài liệu"
-                                                                Binding="{Binding TenFile}"
-                                                                Width="*"/>
-
-                                            <DataGridTextColumn Header="Danh mục"
-                                                                Binding="{Binding DanhMuc}"
-                                                                Width="120"/>
-
-                                            <DataGridTextColumn Header="Dung lượng"
-                                                                Binding="{Binding DungLuongHienThi}"
-                                                                Width="105"/>
-
-                                            <DataGridTextColumn Header="Trạng thái"
-                                                                Binding="{Binding TrangThai}"
-                                                                Width="130"/>
-
-                                            <DataGridTextColumn Header="Ngày tạo"
-                                                                Binding="{Binding NgayTao, StringFormat='dd/MM/yyyy'}"
-                                                                Width="112"/>
-
-                                            <DataGridTextColumn Header="Người tạo"
-                                                                Binding="{Binding NguoiTao}"
-                                                                Width="135"/>
-
-                                            <DataGridTemplateColumn Header="Thao tác" Width="180">
+                                            <DataGridTextColumn Header="Mã" Binding="{Binding Id}" Width="115"/>
+                                            <DataGridTextColumn Header="Tên tài liệu" Binding="{Binding TenFile}" Width="*"/>
+                                            <DataGridTextColumn Header="Danh mục" Binding="{Binding DanhMuc}" Width="120"/>
+                                            <DataGridTextColumn Header="Dung lượng" Binding="{Binding DungLuongHienThi}" Width="105"/>
+                                            <DataGridTextColumn Header="Trạng thái" Binding="{Binding TrangThai}" Width="130"/>
+                                            <DataGridTextColumn Header="Ngày tạo" Binding="{Binding NgayTao, StringFormat='dd/MM/yyyy'}" Width="112"/>
+                                            <DataGridTemplateColumn Header="Thao tác" Width="Auto">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <StackPanel Orientation="Horizontal"
-                                                                    HorizontalAlignment="Center">
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
-                                                            <Button Style="{StaticResource MiniIconButtonStyle}"
-                                                                    ToolTip="Chạy OCR"
-                                                                    Margin="2,0"
-                                                                    Command="{Binding DataContext.StartOcrCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                                    CommandParameter="{Binding}">
-                                                                <ui:SymbolIcon Symbol="Scan24"
-                                                                               FontSize="15"
-                                                                               Foreground="#2563EB"/>
+                                                            <Button Style="{StaticResource MiniIconButtonStyle}" ToolTip="Xem và Giải mã tài liệu" Margin="2,0" 
+                        Command="{Binding DataContext.OpenTaiLieuCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}">
+                                                                <ui:SymbolIcon Symbol="Eye24" FontSize="15" Foreground="#0F172A"/>
                                                             </Button>
 
-                                                            <Button Style="{StaticResource MiniIconButtonStyle}"
-                                                                    ToolTip="Xem"
-                                                                    Margin="2,0">
-                                                                <ui:SymbolIcon Symbol="Eye24"
-                                                                               FontSize="15"
-                                                                               Foreground="#0F172A"/>
+                                                            <Button ToolTip="Đồng bộ lên Cloudflare R2" Margin="2,0" 
+                        Command="{Binding DataContext.UploadCloudCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}">
+                                                                <Button.Style>
+                                                                    <Style TargetType="Button" BasedOn="{StaticResource MiniIconButtonStyle}">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsOnCloud}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Button.Style>
+                                                                <ui:SymbolIcon Symbol="CloudArrowUp24" FontSize="15" Foreground="#059669"/>
                                                             </Button>
 
-                                                            <Button Style="{StaticResource MiniIconButtonStyle}"
-                                                                    ToolTip="Tải xuống"
-                                                                    Margin="2,0">
-                                                                <ui:SymbolIcon Symbol="ArrowDownload24"
-                                                                               FontSize="15"
-                                                                               Foreground="#059669"/>
+                                                            <Button ToolTip="Gỡ khỏi Cloud (Giữ lại máy tính)" Margin="2,0" 
+                        Command="{Binding DataContext.RemoveFromCloudCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}">
+                                                                <Button.Style>
+                                                                    <Style TargetType="Button" BasedOn="{StaticResource MiniIconButtonStyle}">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsOnCloud}" Value="False">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Button.Style>
+                                                                <ui:SymbolIcon Symbol="CloudDismiss24" FontSize="15" Foreground="#D97706"/>
                                                             </Button>
-                                                            
 
-                                                            <Button Style="{StaticResource MiniIconButtonStyle}"
-                                                                    ToolTip="Xóa"
-                                                                    Margin="2,0"
-                                                                    Command="{Binding DataContext.DeleteTaiLieuCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                                    CommandParameter="{Binding}">
-                                                                <ui:SymbolIcon Symbol="Delete24"
-                                                                               FontSize="15"
-                                                                               Foreground="#EF4444"/>
+                                                            <Button ToolTip="Xóa bộ nhớ Local (Free up space)" Margin="2,0" 
+                        Command="{Binding DataContext.RemoveLocalFileCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}">
+                                                                <Button.Style>
+                                                                    <Style TargetType="Button" BasedOn="{StaticResource MiniIconButtonStyle}">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding IsOnLocal}" Value="False">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                            <DataTrigger Binding="{Binding IsOnCloud}" Value="False">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Button.Style>
+                                                                <ui:SymbolIcon Symbol="HardDrive24" FontSize="15" Foreground="#64748B"/>
+                                                            </Button>
+
+                                                            <Button Style="{StaticResource MiniIconButtonStyle}" ToolTip="Lưu file gốc ra ngoài" Margin="2,0" 
+                        Command="{Binding DataContext.DownloadTaiLieuCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}">
+                                                                <ui:SymbolIcon Symbol="ArrowDownload24" FontSize="15" Foreground="#2563EB"/>
+                                                            </Button>
+
+                                                            <Button Style="{StaticResource MiniIconButtonStyle}" ToolTip="Xóa vĩnh viễn" Margin="2,0" 
+                        Command="{Binding DataContext.DeleteTaiLieuCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" CommandParameter="{Binding}">
+                                                                <ui:SymbolIcon Symbol="Delete24" FontSize="15" Foreground="#EF4444"/>
                                                             </Button>
 
                                                         </StackPanel>
@@ -871,229 +565,66 @@
                                     </DataGrid>
                                 </Border>
 
-                                <!-- Overlay loading -->
-                                <Border Background="#990F172A"
-                                        CornerRadius="20"
-                                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
-                                    <StackPanel HorizontalAlignment="Center"
-                                                VerticalAlignment="Center">
-                                        <ui:ProgressRing IsIndeterminate="True"
-                                                         Width="52"
-                                                         Height="52"
-                                                         Foreground="White"/>
-                                        <TextBlock Text="Đang tải dữ liệu..."
-                                                   Foreground="White"
-                                                   FontWeight="SemiBold"
-                                                   Margin="0,12,0,0"
-                                                   HorizontalAlignment="Center"/>
+                                <Border Background="#990F172A" CornerRadius="20" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <ui:ProgressRing IsIndeterminate="True" Width="52" Height="52" Foreground="White"/>
+                                        <TextBlock Text="Đang xử lý..." Foreground="White" FontWeight="SemiBold" Margin="0,12,0,0" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
-
                             </Grid>
-
                         </Grid>
                     </Border>
 
-                    <!-- =========================
-                         PANEL PHỤ BÊN PHẢI
-                    ========================== -->
                     <StackPanel Grid.Column="1">
-
-                        <!-- AI/OCR card -->
-                        <Border Style="{StaticResource MiniCardStyle}"
-                                Margin="0,0,0,14">
+                        <Border Style="{StaticResource MiniCardStyle}" Margin="0,0,0,14">
                             <StackPanel>
-                                <Border Width="50"
-                                        Height="50"
-                                        CornerRadius="18"
-                                        Background="#F5F3FF"
-                                        HorizontalAlignment="Left"
-                                        Margin="0,0,0,14">
-                                    <ui:SymbolIcon Symbol="Bot24"
-                                                   Foreground="#7C3AED"
-                                                   FontSize="26"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"/>
+                                <Border Width="50" Height="50" CornerRadius="18" Background="#F5F3FF" HorizontalAlignment="Left" Margin="0,0,0,14">
+                                    <ui:SymbolIcon Symbol="Person24" Foreground="#7C3AED" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
+                                <TextBlock Text="{Binding CurrentUser.DisplayName}" Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,2"/>
+                                <TextBlock Text="{Binding CurrentUser.Email}" Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" Margin="0,0,0,14"/>
 
-                                <TextBlock Text="Trợ lý AI"
-                                           Style="{StaticResource SectionTitleStyle}"/>
-
-                                <TextBlock Text="Tối ưu cho OCR, phân loại tài liệu và xử lý tác vụ nền."
-                                           Style="{StaticResource SmallMutedTextStyle}"
-                                           TextWrapping="Wrap"
-                                           LineHeight="20"
-                                           Margin="0,6,0,14"/>
-
-                                <ProgressBar Value="{Binding TiLeHoanThanh, Mode=OneWay}"
-                                             Minimum="0"
-                                             Maximum="100"
-                                             Height="8"
-                                             Foreground="#7C3AED"
-                                             Background="#EDE9FE"/>
-
-                                <TextBlock Foreground="#64748B"
-                                           FontSize="12"
-                                           Margin="0,8,0,0">
-                                    <Run Text="Tiến độ hiện tại: "/>
-                                    <Run Text="{Binding TiLeHoanThanh, Mode=OneWay}" FontWeight="Bold"/>
-                                    <Run Text="%"/>
-                                </TextBlock>
+                                <Border CornerRadius="12" Background="#EFF6FF" Padding="10">
+                                    <StackPanel>
+                                        <TextBlock Text="UID Ẩn danh" FontSize="11" Foreground="#64748B"/>
+                                        <TextBlock Text="{Binding CurrentUser.Id}" FontSize="14" FontWeight="Bold" Foreground="#2563EB" FontFamily="Consolas"/>
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
                         </Border>
 
-                        <!-- Storage card -->
-                        <Border Style="{StaticResource MiniCardStyle}"
-                                Margin="0,0,0,14">
+                        <Border Style="{StaticResource MiniCardStyle}">
                             <StackPanel>
-                                <Border Width="50"
-                                        Height="50"
-                                        CornerRadius="18"
-                                        Background="#EFF6FF"
-                                        HorizontalAlignment="Left"
-                                        Margin="0,0,0,14">
-                                    <ui:SymbolIcon Symbol="ArrowUpload24"
-                                                   Foreground="#2563EB"
-                                                   FontSize="26"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"/>
+                                <Border Width="50" Height="50" CornerRadius="18" Background="#EFF6FF" HorizontalAlignment="Left" Margin="0,0,0,14">
+                                    <ui:SymbolIcon Symbol="Folder24" Foreground="#2563EB" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
+                                <TextBlock Text="Quản lý Lưu trữ" Style="{StaticResource SectionTitleStyle}"/>
+                                <TextBlock Text="Nơi lưu trữ file mã hóa cục bộ. Đồng bộ Cloud khi bạn sẵn sàng." Style="{StaticResource SmallMutedTextStyle}" TextWrapping="Wrap" Margin="0,6,0,14"/>
 
-                                <TextBlock Text="Lưu trữ Cloud"
-                                           Style="{StaticResource SectionTitleStyle}"/>
-
-                                <TextBlock Text="Không gian tài liệu cá nhân, nhóm lưu trữ và chia sẻ E2EE."
-                                           Style="{StaticResource SmallMutedTextStyle}"
-                                           TextWrapping="Wrap"
-                                           LineHeight="20"
-                                           Margin="0,6,0,14"/>
-
-                                <Button Style="{StaticResource SecondaryActionButtonStyle}"
-                                        Command="{Binding UploadTaiLieuCommand}">
+                                <Button Style="{StaticResource PrimaryActionButtonStyle}" Height="40" Margin="0,0,0,8" Command="{Binding UploadCloudCommand}">
                                     <StackPanel Orientation="Horizontal">
-                                        <ui:SymbolIcon Symbol="ArrowUpload24"
-                                                       Foreground="#2563EB"
-                                                       FontSize="18"
-                                                       Margin="0,0,7,0"/>
-                                        <TextBlock Text="Upload nhanh"
-                                                   Foreground="#0F172A"
-                                                   VerticalAlignment="Center"/>
+                                        <ui:SymbolIcon Symbol="CloudArrowUp24" Foreground="#FFFFFF" FontSize="16" Margin="0,0,7,0"/>
+                                        <TextBlock Text="Đồng bộ Cloud file chọn" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Style="{StaticResource SecondaryActionButtonStyle}" Height="40" Margin="0,0,0,8" Command="{Binding OpenLocalFolderCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="FolderOpen24" Foreground="#0F172A" FontSize="16" Margin="0,0,7,0"/>
+                                        <TextBlock Text="Mở thư mục Local" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Style="{StaticResource SecondaryActionButtonStyle}" Height="40" Command="{Binding ChangeLocalFolderCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="Settings24" Foreground="#64748B" FontSize="16" Margin="0,0,7,0"/>
+                                        <TextBlock Text="Chọn nơi lưu trữ..." Foreground="#0F172A" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
                         </Border>
-
-                        <!-- Upgrade card -->
-                        <Border CornerRadius="24"
-                                BorderBrush="#FDE68A"
-                                BorderThickness="1"
-                                Padding="20"
-                                Background="#FFFBEB">
-                            <StackPanel>
-                                <Border Width="50"
-                                        Height="50"
-                                        CornerRadius="18"
-                                        Background="#FEF3C7"
-                                        HorizontalAlignment="Left"
-                                        Margin="0,0,0,14">
-                                    <ui:SymbolIcon Symbol="Star24"
-                                                   Foreground="#D97706"
-                                                   FontSize="26"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"/>
-                                </Border>
-
-                                <TextBlock Text="Nâng cấp gói"
-                                           Foreground="#92400E"
-                                           FontSize="17"
-                                           FontWeight="Bold"/>
-
-                                <TextBlock Text="Mở rộng dung lượng Cloud và lượt dùng AI cho tài liệu lớn."
-                                           Foreground="#92400E"
-                                           FontSize="13"
-                                           TextWrapping="Wrap"
-                                           LineHeight="20"
-                                           Margin="0,6,0,14"/>
-
-                                <Button Style="{StaticResource PrimaryActionButtonStyle}"
-                                        Background="#F59E0B"
-                                        BorderBrush="#F59E0B"
-                                        Command="{Binding OpenUpgradeCommand}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <ui:SymbolIcon Symbol="Star24"
-                                                       Foreground="#FFFFFF"
-                                                       FontSize="18"
-                                                       Margin="0,0,7,0"/>
-                                        <TextBlock Text="Xem gói dịch vụ"
-                                                   Foreground="#FFFFFF"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </Border>
-
                     </StackPanel>
                 </Grid>
-
-                <!-- =========================
-                     PHÂN TRANG
-                ========================== -->
-                <Border Grid.Row="3"
-                        CornerRadius="20"
-                        Background="#EEFFFFFF"
-                        BorderBrush="#D8E6FF"
-                        BorderThickness="1"
-                        Padding="16,12"
-                        Margin="0,18,0,0">
-
-                    <DockPanel>
-                        <TextBlock DockPanel.Dock="Left"
-                                   VerticalAlignment="Center"
-                                   Foreground="#64748B"
-                                   FontSize="13">
-                            <Run Text="Tổng: "/>
-                            <Run Text="{Binding TotalItems, Mode=OneWay}" FontWeight="Bold" Foreground="#0F172A"/>
-                            <Run Text="  |  Trang "/>
-                            <Run Text="{Binding CurrentPage, Mode=OneWay}" FontWeight="Bold" Foreground="#0F172A"/>
-                            <Run Text=" / "/>
-                            <Run Text="{Binding TotalPages, Mode=OneWay}" FontWeight="Bold" Foreground="#0F172A"/>
-                        </TextBlock>
-
-                        <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Right"
-                                    DockPanel.Dock="Right">
-
-                            <Button Style="{StaticResource SecondaryActionButtonStyle}"
-                                    Command="{Binding PrevPageCommand}"
-                                    Margin="0,0,10,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:SymbolIcon Symbol="ChevronLeft24"
-                                                   Foreground="#2563EB"
-                                                   FontSize="16"
-                                                   Margin="0,0,5,0"/>
-                                    <TextBlock Text="Trước"
-                                               Foreground="#0F172A"
-                                               VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
-
-                            <Button Style="{StaticResource SecondaryActionButtonStyle}"
-                                    Command="{Binding NextPageCommand}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Sau"
-                                               Foreground="#0F172A"
-                                               VerticalAlignment="Center"
-                                               Margin="0,0,5,0"/>
-                                    <ui:SymbolIcon Symbol="ChevronRight24"
-                                                   Foreground="#2563EB"
-                                                   FontSize="16"/>
-                                </StackPanel>
-                            </Button>
-
-                        </StackPanel>
-                    </DockPanel>
-                </Border>
-
             </Grid>
         </Grid>
     </Grid>
