@@ -50,6 +50,11 @@ namespace TroLySoCaNhan.Views
                 storageWindow.ShowDialog();
                 this.Show();
             };
+            vm.OcrRequested += (_, _) =>
+            {
+                var ocrWindow = new OcrWindow(vm.CurrentUser) { Owner = this };
+                ocrWindow.ShowDialog();
+            };
         }
     }
 }

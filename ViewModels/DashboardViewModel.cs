@@ -105,6 +105,7 @@ namespace TroLySoCaNhan.ViewModels
         public RelayCommand DeleteTaiLieuCommand { get; }
         public RelayCommand OpenLocalFolderCommand { get; }
         public RelayCommand ChangeLocalFolderCommand { get; }
+        public RelayCommand OpenOcrCommand { get; }
 
         public RelayCommand OpenProfileCommand { get; }
         public RelayCommand OpenSettingsCommand { get; }
@@ -117,6 +118,7 @@ namespace TroLySoCaNhan.ViewModels
         public event EventHandler? UpgradeRequested;
         public event EventHandler? GroupRequested;
         public event EventHandler? StorageRequested;
+        public event EventHandler? OcrRequested;
 
         public DashboardViewModel(NguoiDung userDb)
         {
@@ -141,7 +143,7 @@ namespace TroLySoCaNhan.ViewModels
 
             RemoveFromCloudCommand = new RelayCommand(async t => { var item = t as TaiLieuItem ?? SelectedTaiLieu; if (item != null) await RemoveFromCloudAsync(item); }, _ => !IsLoading);
             RemoveLocalFileCommand = new RelayCommand(async t => { var item = t as TaiLieuItem ?? SelectedTaiLieu; if (item != null) await RemoveLocalFileAsync(item); }, _ => !IsLoading);
-
+            OpenOcrCommand = new RelayCommand(_ => OcrRequested?.Invoke(this, EventArgs.Empty));
             OpenTaiLieuCommand = new RelayCommand(async t => { if (t is TaiLieuItem item) await OpenTaiLieuAsync(item); }, _ => !IsLoading);
             DownloadTaiLieuCommand = new RelayCommand(async t => { if (t is TaiLieuItem item) await DownloadTaiLieuAsync(item); }, _ => !IsLoading);
             DeleteTaiLieuCommand = new RelayCommand(async t => { if (t is TaiLieuItem item) await DeleteTaiLieuAsync(item); }, _ => !IsLoading);

@@ -300,6 +300,13 @@
                                 <TextBlock Text="Nhóm" Foreground="#0F172A" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+
+                        <Button Style="{StaticResource TopNavButtonStyle}" Command="{Binding OpenOcrCommand}" ToolTip="Quét tài liệu AI" Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="Scan24" Foreground="#2563EB" FontSize="18" Margin="0,0,6,0"/>
+                                <TextBlock Text="Quét OCR" Foreground="#0F172A" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                         <Button Style="{StaticResource TopNavButtonStyle}" Command="{Binding OpenUpgradeCommand}" ToolTip="Nâng cấp tài khoản">
                             <StackPanel Orientation="Horizontal">
                                 <ui:SymbolIcon Symbol="Star24" Foreground="#F59E0B" FontSize="18" Margin="0,0,6,0"/>
