@@ -394,14 +394,20 @@
                                                         <ColumnDefinition Width="*"/>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
+
                                                     <Border Grid.Column="0" CornerRadius="18" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" Padding="14" Margin="0,0,10,0">
-                                                        <RadioButton GroupName="Theme" Content="Sáng" FontWeight="SemiBold" IsChecked="{Binding SelectedTheme, Mode=TwoWay, Converter={StaticResource StringEquals}, ConverterParameter=Light}"/>
+                                                        <RadioButton GroupName="Theme" Content="Sáng" FontWeight="SemiBold" 
+                                                                     Command="{Binding ChangeThemeCommand}" CommandParameter="Light" IsChecked="True"/>
                                                     </Border>
+
                                                     <Border Grid.Column="1" CornerRadius="18" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" Padding="14" Margin="0,0,10,0">
-                                                        <RadioButton GroupName="Theme" Content="Tối" FontWeight="SemiBold" IsChecked="{Binding SelectedTheme, Mode=TwoWay, Converter={StaticResource StringEquals}, ConverterParameter=Dark}"/>
+                                                        <RadioButton GroupName="Theme" Content="Tối" FontWeight="SemiBold" 
+                                                                     Command="{Binding ChangeThemeCommand}" CommandParameter="Dark"/>
                                                     </Border>
+
                                                     <Border Grid.Column="2" CornerRadius="18" Background="#FFFFFF" BorderBrush="#D8E6FF" BorderThickness="1" Padding="14">
-                                                        <RadioButton GroupName="Theme" Content="Hệ thống" FontWeight="SemiBold" IsChecked="{Binding SelectedTheme, Mode=TwoWay, Converter={StaticResource StringEquals}, ConverterParameter=System}"/>
+                                                        <RadioButton GroupName="Theme" Content="Hệ thống" FontWeight="SemiBold" 
+                                                                     Command="{Binding ChangeThemeCommand}" CommandParameter="System"/>
                                                     </Border>
                                                 </Grid>
                                             </StackPanel>

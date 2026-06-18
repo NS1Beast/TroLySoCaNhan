@@ -1,4 +1,5 @@
-﻿using Wpf.Ui.Controls;
+﻿using TroLySoCaNhan.ViewModels;
+using Wpf.Ui.Controls;
 
 namespace TroLySoCaNhan.Views
 {
@@ -7,6 +8,7 @@ namespace TroLySoCaNhan.Views
         public Group()
         {
             InitializeComponent();
+            DataContext = new GroupViewModel();
         }
     }
 }

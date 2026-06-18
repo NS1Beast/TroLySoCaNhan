@@ -9,7 +9,6 @@ using Wpf.Ui.Appearance;
 
 namespace TroLySoCaNhan.ViewModels
 {
-    // LỚP DTO DUY NHẤT DÙNG CHUNG CHO CẢ DASHBOARD VÀ PROFILE
     public class UserDto : ViewModelBase
     {
         public Guid DbId { get; set; }
@@ -31,9 +30,6 @@ namespace TroLySoCaNhan.ViewModels
     {
         public UserDto User { get; }
 
-        // ==========================================
-        // QUẢN LÝ TRẠNG THÁI HIỂN THỊ (GOOGLE HAY TÀI KHOẢN THƯỜNG)
-        // ==========================================
         private bool _isEmailEditable = true;
         public bool IsEmailEditable { get => _isEmailEditable; set => SetProperty(ref _isEmailEditable, value); }
 
@@ -43,9 +39,6 @@ namespace TroLySoCaNhan.ViewModels
         private string _googleWarningMessage = string.Empty;
         public string GoogleWarningMessage { get => _googleWarningMessage; set => SetProperty(ref _googleWarningMessage, value); }
 
-        // ==========================================
-        // BIẾN ĐỔI MẬT KHẨU & THÔNG BÁO COPY
-        // ==========================================
         private string _oldPassword = string.Empty;
         public string OldPassword { get => _oldPassword; set => SetProperty(ref _oldPassword, value); }
 
@@ -64,11 +57,8 @@ namespace TroLySoCaNhan.ViewModels
         private bool _isUpdatingProfile;
         public bool IsUpdatingProfile { get => _isUpdatingProfile; set { if (SetProperty(ref _isUpdatingProfile, value)) UpdateProfileCommand.RaiseCanExecuteChanged(); } }
 
-        // ==========================================
-        // CÀI ĐẶT HỆ THỐNG
-        // ==========================================
-        private string _selectedTheme = "System";
-        public string SelectedTheme { get => _selectedTheme; set { if (SetProperty(ref _selectedTheme, value)) ApplyTheme(); } }
+        private string _selectedTheme = "Light";
+        public string SelectedTheme { get => _selectedTheme; set => SetProperty(ref _selectedTheme, value); }
 
         public List<string> Languages { get; } = new List<string> { "Tiếng Việt (vi-VN)", "English (en-US)" };
         private string _selectedLanguage = "Tiếng Việt (vi-VN)";
@@ -84,21 +74,23 @@ namespace TroLySoCaNhan.ViewModels
         private bool _isStatusError;
         public bool IsStatusError { get => _isStatusError; set => SetProperty(ref _isStatusError, value); }
 
+        // ==========================================
+        // KHAI BÁO COMMAND
+        // ==========================================
         public RelayCommand CopyIdCommand { get; }
         public RelayCommand ChangePasswordCommand { get; }
         public RelayCommand UpdateProfileCommand { get; }
+        public RelayCommand ChangeThemeCommand { get; } // Command đổi theme mới
 
         public ProfileViewModel(UserDto user)
         {
             User = user;
 
-            // Xóa chữ Email ảo lúc đăng ký nhanh đi để người dùng điền email thật
             if (User.Email.StartsWith("useremail") && User.Email.EndsWith("@gmail.com"))
             {
                 User.Email = "";
             }
 
-            // Kiểm tra xem User này có phải đăng nhập bằng Google không
             using (var db = new TroLySoCaNhanContext())
             {
                 bool isGoogleAccount = db.TaiKhoanLienKets.Any(tk => tk.MaNguoiDung == user.DbId && tk.NenTang == "Google");
@@ -113,9 +105,18 @@ namespace TroLySoCaNhan.ViewModels
             CopyIdCommand = new RelayCommand(async _ => await CopyIdToClipboardAsync());
             UpdateProfileCommand = new RelayCommand(async _ => await DoUpdateProfileAsync(), _ => !IsUpdatingProfile);
             ChangePasswordCommand = new RelayCommand(async _ => await DoChangePasswordAsync(), _ => !IsChangingPassword && !string.IsNullOrWhiteSpace(OldPassword) && !string.IsNullOrWhiteSpace(NewPassword) && NewPassword == ConfirmNewPassword);
+
+            // Lệnh đổi Theme
+            ChangeThemeCommand = new RelayCommand(param =>
+            {
+                if (param is string theme)
+                {
+                    SelectedTheme = theme;
+                    ApplyTheme();
+                }
+            });
         }
 
-        // Tạo hiệu ứng hiện thông báo Đã Copy và mờ đi sau 2.5 giây
         private async Task CopyIdToClipboardAsync()
         {
             try
@@ -139,14 +140,12 @@ namespace TroLySoCaNhan.ViewModels
                 var dbUser = db.NguoiDungs.FirstOrDefault(u => u.Id == User.DbId);
                 if (dbUser != null)
                 {
-                    // Kiểm tra xem Username mới có bị trùng với ai khác không
                     if (db.NguoiDungs.Any(u => u.TenDangNhap == User.UserName && u.Id != User.DbId))
                     {
                         ShowStatus("Tên đăng nhập (Username) này đã có người sử dụng!", true);
                         return;
                     }
 
-                    // Kiểm tra xem Email có bị trùng với ai khác không
                     if (IsEmailEditable && !string.IsNullOrWhiteSpace(User.Email))
                     {
                         if (db.NguoiDungs.Any(u => u.Email == User.Email && u.Id != User.DbId))
@@ -182,14 +181,12 @@ namespace TroLySoCaNhan.ViewModels
                 var dbUser = db.NguoiDungs.FirstOrDefault(u => u.Id == User.DbId);
                 if (dbUser == null) { ShowStatus("Lỗi: Không tìm thấy tài khoản.", true); return; }
 
-                // Kiểm tra Mật khẩu cũ
                 if (string.IsNullOrEmpty(dbUser.MatKhauHash) || !BCrypt.Net.BCrypt.Verify(OldPassword, dbUser.MatKhauHash))
                 {
                     ShowStatus("Mật khẩu hiện tại không đúng.", true);
                     return;
                 }
 
-                // Đổi mật khẩu mới
                 dbUser.MatKhauHash = BCrypt.Net.BCrypt.HashPassword(NewPassword);
                 dbUser.NgayCapNhat = DateTime.Now;
                 await db.SaveChangesAsync();
@@ -205,17 +202,15 @@ namespace TroLySoCaNhan.ViewModels
         {
             try
             {
-                switch (SelectedTheme)
-                {
-                    case "Light": ApplicationThemeManager.Apply(ApplicationTheme.Light); break;
-                    case "Dark": ApplicationThemeManager.Apply(ApplicationTheme.Dark); break;
-                    default:
-                        var sysTheme = SystemParameters.WindowGlassBrush == null ? ApplicationTheme.Light : ApplicationTheme.Dark;
-                        ApplicationThemeManager.Apply(sysTheme);
-                        break;
-                }
+                // Gọi thư viện Wpf.Ui đổi Theme toàn cục
+                if (SelectedTheme == "Dark")
+                    ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+                else if (SelectedTheme == "Light")
+                    ApplicationThemeManager.Apply(ApplicationTheme.Light);
+                else
+                    ApplicationThemeManager.ApplySystemTheme();
             }
-            catch { }
+            catch (Exception ex) { ShowStatus("Lỗi đổi Theme: " + ex.Message, true); }
         }
 
         private void ShowStatus(string msg, bool isError) { StatusMessage = msg; IsStatusError = isError; }

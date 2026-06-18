@@ -68,9 +68,6 @@ namespace TroLySoCaNhan.ViewModels
             }
         }
 
-        // ==========================================
-        // CẤU HÌNH SẮP XẾP
-        // ==========================================
         public System.Collections.Generic.List<string> SortOptions { get; } = new System.Collections.Generic.List<string>
         {
             "Ngày tạo (Mới nhất)",
@@ -88,15 +85,11 @@ namespace TroLySoCaNhan.ViewModels
             {
                 if (SetProperty(ref _selectedSortOption, value))
                 {
-                    // Tự động tải lại danh sách khi người dùng đổi kiểu sắp xếp
                     _ = LoadDocumentsAsync();
                 }
             }
         }
 
-        // ==========================================
-        // KHAI BÁO CÁC COMMAND
-        // ==========================================
         public RelayCommand LoadDocumentsCommand { get; }
         public RelayCommand SearchCommand { get; }
         public RelayCommand NextPageCommand { get; }
@@ -164,18 +157,14 @@ namespace TroLySoCaNhan.ViewModels
                 var dialog = new Microsoft.Win32.OpenFolderDialog { Title = "Chọn nơi lưu trữ Local" };
                 if (dialog.ShowDialog() == true)
                 {
-                    // Lấy đường dẫn cũ TRƯỚC KHI đổi
                     string oldVaultPath = TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id);
                     string oldKeyPath = Path.Combine(oldVaultPath, "private.key.enc");
 
-                    // Cập nhật cấu hình sang đường dẫn mới
                     TroLySoCaNhan.Services.LocalVaultService.SetCustomVaultPath(dialog.FolderName);
 
-                    // Lấy đường dẫn mới SAU KHI đổi
                     string newVaultPath = TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id);
                     string newKeyPath = Path.Combine(newVaultPath, "private.key.enc");
 
-                    // TỰ ĐỘNG DI DỜI PRIVATE KEY SANG NHÀ MỚI
                     try
                     {
                         if (File.Exists(oldKeyPath) && oldKeyPath != newKeyPath)
@@ -213,24 +202,18 @@ namespace TroLySoCaNhan.ViewModels
             _ = LoadDocumentsAsync();
         }
 
-        // ==========================================
-        // LOAD DỮ LIỆU LỌC TÌM KIẾM, SẮP XẾP VÀ TRẠNG THÁI
-        // ==========================================
         private async Task LoadDocumentsAsync()
         {
             IsLoading = true;
             try
             {
                 string vaultPath = TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id);
-
-                // Lấy từ khóa tìm kiếm (Chuyển về chữ thường để dễ so sánh)
                 string keyword = SearchKeyword?.Trim().ToLower() ?? "";
 
                 var listFiles = await Task.Run(() =>
                 {
                     using var db = new TroLySoCaNhanContext();
 
-                    // 1. LẤY DỮ LIỆU CƠ BẢN TỪ DATABASE XUỐNG RAM TRƯỚC
                     var query = db.TaiLieus
                         .Where(t => t.MaChuSoHuu == CurrentUser.DbId && t.DaXoa == false)
                         .Select(t => new
@@ -241,7 +224,6 @@ namespace TroLySoCaNhan.ViewModels
                             PhienBan = db.PhienBanTaiLieus.OrderByDescending(p => p.NgayCapNhat).FirstOrDefault(p => p.MaTaiLieu == t.Id)
                         }).ToList();
 
-                    // 2. XỬ LÝ TÌM KIẾM (TÌM THEO TÊN HOẶC ID)
                     if (!string.IsNullOrEmpty(keyword))
                     {
                         query = query.Where(x =>
@@ -250,7 +232,6 @@ namespace TroLySoCaNhan.ViewModels
                         ).ToList();
                     }
 
-                    // 3. XỬ LÝ SẮP XẾP (Đã được liên kết với ComboBox trên giao diện)
                     System.Collections.Generic.IEnumerable<dynamic> sortedList = query;
                     switch (SelectedSortOption)
                     {
@@ -272,7 +253,6 @@ namespace TroLySoCaNhan.ViewModels
                             break;
                     }
 
-                    // 4. MAP DỮ LIỆU SANG ITEM HIỂN THỊ & KIỂM TRA TRẠNG THÁI LOCAL/CLOUD
                     return sortedList.Select(x =>
                     {
                         bool isCloud = x.PhienBan?.TrangThaiUpload == 1;
@@ -295,7 +275,7 @@ namespace TroLySoCaNhan.ViewModels
                             Id = x.Id.ToString().Substring(0, 8).ToUpper(),
                             TenFile = x.TenTaiLieu ?? "Không tên",
                             DungLuong = fileSize,
-                            DanhMuc = "Cá nhân",
+                            DanhMuc = "Gần đây",
                             TrangThai = status,
                             IsOnCloud = isCloud,
                             IsOnLocal = isLocal,
@@ -542,10 +522,15 @@ namespace TroLySoCaNhan.ViewModels
                     if (taiLieu != null)
                     {
                         if (phienBan != null) objectKeyR2 = phienBan.ObjectKeyR2;
+
+                        // Xóa liên kết trong bảng trung gian trước
+                        db.Database.ExecuteSqlRaw("DELETE FROM PhanLoaiTaiLieu WHERE MaTaiLieu = {0}", item.DbId);
+
                         db.ChiaSeTaiLieuCaNhans.RemoveRange(db.ChiaSeTaiLieuCaNhans.Where(c => c.MaTaiLieu == item.DbId));
                         db.PhienBanTaiLieus.RemoveRange(db.PhienBanTaiLieus.Where(p => p.MaTaiLieu == item.DbId));
                         db.NhatKyTaiLieus.RemoveRange(db.NhatKyTaiLieus.Where(n => n.MaTaiLieu == item.DbId));
                         db.TacVuNenChiTiets.RemoveRange(db.TacVuNenChiTiets.Where(a => a.MaTaiLieuGoc == item.DbId));
+
                         var t = db.TaiLieus.FirstOrDefault(x => x.Id == item.DbId);
                         if (t != null) db.TaiLieus.Remove(t);
                         db.SaveChanges();

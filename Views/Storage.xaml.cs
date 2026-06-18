@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using TroLySoCaNhan.ViewModels;
 using Wpf.Ui.Controls;
 
 namespace TroLySoCaNhan.Views
 {
-    /// <summary>
-    /// Interaction logic for Storage.xaml
-    /// </summary>
     public partial class Storage : FluentWindow
     {
+        // Constructor rỗng bắt buộc cho WPF Designer
         public Storage()
         {
             InitializeComponent();
+        }
+
+        // Constructor thật nhận thông tin User từ Dashboard truyền qua
+        public Storage(UserDto currentUser)
+        {
+            InitializeComponent();
+            // Nối giao diện với StorageViewModel thay vì DashboardViewModel
+            this.DataContext = new StorageViewModel(currentUser);
         }
     }
 }

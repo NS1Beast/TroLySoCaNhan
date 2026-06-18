@@ -761,7 +761,9 @@
                                     BorderThickness="1"
                                     ClipToBounds="True">
 
-                                <DataGrid x:Name="DgMembers"
+                                    <DataGrid x:Name="DgMembers"
+                                          ItemsSource="{Binding Members}"
+                                          SelectedItem="{Binding SelectedMember, Mode=TwoWay}"
                                           AutoGenerateColumns="False"
                                           IsReadOnly="True"
                                           HeadersVisibility="Column"
