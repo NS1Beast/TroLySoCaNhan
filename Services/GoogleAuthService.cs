@@ -11,9 +11,12 @@ namespace TroLySoCaNhan.Models
 {
     public class GoogleAuthService
     {
-        private const string ClientId = "860492625504-p5iu36kaa0eq9uuv2g8p51ksr4ic78gl.apps.googleusercontent.com";
-        private const string ClientSecret = "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";
+        private const string ClientId = "clientID";
+        private const string ClientSecret = "SlientSecret";
         private readonly string[] Scopes = { "openid", "email", "profile" };
+        //private const string ClientId = "860492625504-p5iu36kaa0eq9uuv2g8p51ksr4ic78gl.apps.googleusercontent.com";
+        //private const string ClientSecret = "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";
+        //private readonly string[] Scopes = { "openid", "email", "profile" };
 
         /// <summary>
         /// Trả về (Email, Tên hiển thị) nếu đăng nhập thành công
