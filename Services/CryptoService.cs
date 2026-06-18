@@ -14,9 +14,7 @@ namespace TroLySoCaNhan.Services
 {
     public class CryptoService
     {
-        // ====================================================
         // 1. SINH CẶP KHÓA PGP/RSA (Public & Private)
-        // ====================================================
         public static (string PublicKey, string PrivateKey) GenerateKeyPair()
         {
             RsaKeyPairGenerator rsaKeyPairGenerator = new RsaKeyPairGenerator();
@@ -33,10 +31,7 @@ namespace TroLySoCaNhan.Services
 
             return (publicKeyStr, privateKeyStr);
         }
-
-        // ====================================================
         // 2. BẢO VỆ PRIVATE KEY BẰNG WINDOWS DPAPI
-        // ====================================================
         /// <summary>
         /// Mã hóa Private Key bằng tài khoản Windows và lưu xuống Local Vault
         /// </summary>
@@ -65,12 +60,8 @@ namespace TroLySoCaNhan.Services
             byte[] secretBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
             return Encoding.UTF8.GetString(secretBytes);
         }
-
-        // ====================================================
-        // 3. CÁC HÀM AES SẼ DÙNG CHO GIAI ĐOẠN 2 (CHUẨN BỊ SẴN)
-        // ===================================================
         /// <summary>
-        /// Mã hóa khóa AES bằng Public Key của người dùng (Để lưu lên Database)
+        /// Mã hóa khóa AES bằng Public Key của người dùng (lưu lên Database)
         /// </summary>
         public static string EncryptAesKey(byte[] aesKey, string publicKeyBase64)
         {
@@ -83,10 +74,7 @@ namespace TroLySoCaNhan.Services
             return Convert.ToBase64String(encrypted);
         }
 
-        // ====================================================
         // 4. MÃ HÓA FILE VẬT LÝ BẰNG AES-256
-        // ====================================================
-        
         /// <summary>
         /// Sinh ra khóa AES ngẫu nhiên 32 byte (256-bit)
         /// </summary>
@@ -118,9 +106,7 @@ namespace TroLySoCaNhan.Services
             
             await fsIn.CopyToAsync(cs);
         }
-        // ====================================================
         // 5. GIẢI MÃ KHÓA AES BẰNG PRIVATE KEY (PGP)
-        // ====================================================
         public static byte[] DecryptAesKey(string encryptedAesKeyBase64, string privateKeyBase64)
         {
             byte[] encryptedBytes = Convert.FromBase64String(encryptedAesKeyBase64);
@@ -132,10 +118,7 @@ namespace TroLySoCaNhan.Services
 
             return cipher.ProcessBlock(encryptedBytes, 0, encryptedBytes.Length);
         }
-
-        // ====================================================
         // 6. GIẢI MÃ FILE .ENC VỀ LẠI FILE GỐC
-        // ====================================================
         public static async System.Threading.Tasks.Task DecryptFileAsync(string inputEncryptedPath, string outputDecryptedPath, byte[] aesKey)
         {
             using FileStream fsIn = new FileStream(inputEncryptedPath, FileMode.Open, FileAccess.Read);

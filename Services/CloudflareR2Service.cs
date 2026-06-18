@@ -7,7 +7,7 @@ namespace TroLySoCaNhan.Services
 {
     public class CloudflareR2Service
     {
-        // THÔNG TIN KẾT NỐI CLOUDFLARE R2 CỦA BẠN
+        // THÔNG TIN KẾT NỐI CLOUDFLARE R2 
         private const string AccessKey = "8fd44418cd191cd0c46e7e9618aff2fc";
         private const string SecretKey = "913a770d28171472f8f8ba605af9da684ea2e64873438d2112426bb327891e67";
         private const string ServiceUrl = "https://959bc83b08a72a9ba0460da85ed47ac8.r2.cloudflarestorage.com";
@@ -36,10 +36,7 @@ namespace TroLySoCaNhan.Services
             // Gửi lệnh Xóa vĩnh viễn Object khỏi Bucket
             await client.DeleteObjectAsync(request);
         }
-
-        // ====================================================
         // HÀM UPLOAD FILE LÊN R2 (Sử dụng PutObjectRequest)
-        // ====================================================
         public static async Task<string> UploadFileAsync(string filePath, string objectKey)
         {
             using var client = GetS3Client();
@@ -51,7 +48,6 @@ namespace TroLySoCaNhan.Services
                 Key = objectKey,
                 FilePath = filePath,
 
-                // ĐÂY LÀ "CHÌA KHÓA" ĐỂ KHẮC PHỤC TRIỆT ĐỂ LỖI STREAMING CỦA CLOUDFLARE R2
                 DisablePayloadSigning = true
             };
 
@@ -60,10 +56,7 @@ namespace TroLySoCaNhan.Services
 
             return objectKey;
         }
-
-        // ====================================================
         // HÀM DOWNLOAD FILE TỪ R2
-        // ====================================================
         public static async Task DownloadFileAsync(string objectKey, string downloadPath)
         {
             using var client = GetS3Client();

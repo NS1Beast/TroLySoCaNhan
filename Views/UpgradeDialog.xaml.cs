@@ -6,14 +6,17 @@ namespace TroLySoCaNhan.Views
 {
     public partial class UpgradeDialog : FluentWindow
     {
-        public UpgradeDialog()
+        public UpgradeDialog(UserDto currentUser)
         {
             InitializeComponent();
+            var vm = new UpgradeViewModel(currentUser);
+            this.DataContext = vm;
 
-            if (DataContext is UpgradeViewModel vm)
+            vm.CloseRequested += (s, e) =>
             {
-                vm.CloseRequested += (_, _) => this.Close();
-            }
+                this.DialogResult = true;
+                this.Close();
+            };
         }
     }
 }

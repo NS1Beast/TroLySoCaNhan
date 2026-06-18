@@ -80,7 +80,11 @@ namespace TroLySoCaNhan.ViewModels
         public RelayCommand CopyIdCommand { get; }
         public RelayCommand ChangePasswordCommand { get; }
         public RelayCommand UpdateProfileCommand { get; }
-        public RelayCommand ChangeThemeCommand { get; } // Command đổi theme mới
+        public RelayCommand ChangeThemeCommand { get; }
+
+        // CHỨC NĂNG ĐĂNG XUẤT
+        public RelayCommand LogoutCommand { get; }
+        public event EventHandler? LogoutRequested;
 
         public ProfileViewModel(UserDto user)
         {
@@ -106,7 +110,15 @@ namespace TroLySoCaNhan.ViewModels
             UpdateProfileCommand = new RelayCommand(async _ => await DoUpdateProfileAsync(), _ => !IsUpdatingProfile);
             ChangePasswordCommand = new RelayCommand(async _ => await DoChangePasswordAsync(), _ => !IsChangingPassword && !string.IsNullOrWhiteSpace(OldPassword) && !string.IsNullOrWhiteSpace(NewPassword) && NewPassword == ConfirmNewPassword);
 
-            // Lệnh đổi Theme
+            // Bắt sự kiện Đăng xuất
+            LogoutCommand = new RelayCommand(_ =>
+            {
+                if (MessageBox.Show("Bạn có chắc chắn muốn đăng xuất?", "Xác nhận", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    LogoutRequested?.Invoke(this, EventArgs.Empty);
+                }
+            });
+
             ChangeThemeCommand = new RelayCommand(param =>
             {
                 if (param is string theme)
@@ -202,13 +214,9 @@ namespace TroLySoCaNhan.ViewModels
         {
             try
             {
-                // Gọi thư viện Wpf.Ui đổi Theme toàn cục
-                if (SelectedTheme == "Dark")
-                    ApplicationThemeManager.Apply(ApplicationTheme.Dark);
-                else if (SelectedTheme == "Light")
-                    ApplicationThemeManager.Apply(ApplicationTheme.Light);
-                else
-                    ApplicationThemeManager.ApplySystemTheme();
+                if (SelectedTheme == "Dark") ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+                else if (SelectedTheme == "Light") ApplicationThemeManager.Apply(ApplicationTheme.Light);
+                else ApplicationThemeManager.ApplySystemTheme();
             }
             catch (Exception ex) { ShowStatus("Lỗi đổi Theme: " + ex.Message, true); }
         }

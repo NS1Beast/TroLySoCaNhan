@@ -10,8 +10,6 @@ namespace TroLySoCaNhan.Views
         public DashBoard(NguoiDung userDb)
         {
             InitializeComponent();
-
-            // Nạp dữ liệu thật vào ViewModel
             var vm = new DashboardViewModel(userDb);
             this.DataContext = vm;
 
@@ -32,17 +30,17 @@ namespace TroLySoCaNhan.Views
             vm.UpgradeRequested += (_, _) =>
             {
                 this.Hide();
-                var upgradeWindow = new UpgradeDialog { Owner = this };
+                var upgradeWindow = new UpgradeDialog(vm.CurrentUser) { Owner = this };
                 upgradeWindow.ShowDialog();
                 this.Show();
             };
 
             vm.GroupRequested += (_, _) =>
             {
-                this.Hide(); // Ẩn Dashboard
-                var groupWindow = new Group { Owner = this };
-                groupWindow.ShowDialog(); // Mở cửa sổ Nhóm (chặn tương tác các cửa sổ khác)
-                this.Show(); // Hiện lại Dashboard khi Group đóng
+                this.Hide(); 
+                var groupWindow = new Group(vm.CurrentUser) { Owner = this };
+                groupWindow.ShowDialog(); 
+                this.Show(); 
             };
 
             vm.StorageRequested += (_, _) =>

@@ -31,6 +31,19 @@ namespace TroLySoCaNhan.ViewModels
         public int TotalItems { get => _totalItems; set => SetProperty(ref _totalItems, value); }
 
         // ==========================================
+        // THỐNG KÊ CLOUD
+        // ==========================================
+        private int _totalCloudFiles;
+        public int TotalCloudFiles { get => _totalCloudFiles; set => SetProperty(ref _totalCloudFiles, value); }
+
+        private string _usedStorageText = "0 KB";
+        public string UsedStorageText { get => _usedStorageText; set => SetProperty(ref _usedStorageText, value); }
+
+        // Khởi tạo mặc định hiển thị 5 GB
+        private string _remainingStorageText = "5 GB";
+        public string RemainingStorageText { get => _remainingStorageText; set => SetProperty(ref _remainingStorageText, value); }
+
+        // ==========================================
         // QUẢN LÝ DIALOG TẠO THƯ MỤC
         // ==========================================
         private bool _isCreateFolderDialogOpen;
@@ -63,15 +76,6 @@ namespace TroLySoCaNhan.ViewModels
             get => _selectedTaiLieu;
             set => SetProperty(ref _selectedTaiLieu, value);
         }
-
-        private bool _isProcessingOcr;
-        public bool IsProcessingOcr { get => _isProcessingOcr; set => SetProperty(ref _isProcessingOcr, value); }
-
-        private double _tiLeHoanThanh;
-        public double TiLeHoanThanh { get => _tiLeHoanThanh; set => SetProperty(ref _tiLeHoanThanh, value); }
-
-        private string _ocrStatusMessage = string.Empty;
-        public string OcrStatusMessage { get => _ocrStatusMessage; set => SetProperty(ref _ocrStatusMessage, value); }
 
         public List<string> SortOptions { get; } = new List<string>
         {
@@ -127,7 +131,6 @@ namespace TroLySoCaNhan.ViewModels
                 }
             });
 
-            // LOGIC DIALOG TẠO THƯ MỤC
             OpenCreateFolderDialogCommand = new RelayCommand(_ => { NewFolderName = string.Empty; IsCreateFolderDialogOpen = true; });
             CancelCreateFolderCommand = new RelayCommand(_ => { IsCreateFolderDialogOpen = false; });
             ConfirmCreateFolderCommand = new RelayCommand(async _ => await ConfirmCreateFolderAsync(), _ => !string.IsNullOrWhiteSpace(NewFolderName));
@@ -143,19 +146,35 @@ namespace TroLySoCaNhan.ViewModels
             OpenLocalFolderCommand = new RelayCommand(_ => { System.Diagnostics.Process.Start("explorer.exe", TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id)); });
             ChangeLocalFolderCommand = new RelayCommand(_ => {
                 var dialog = new Microsoft.Win32.OpenFolderDialog { Title = "Chọn nơi lưu trữ Local" };
-                if (dialog.ShowDialog() == true) { TroLySoCaNhan.Services.LocalVaultService.SetCustomVaultPath(dialog.FolderName); }
+                if (dialog.ShowDialog() == true)
+                {
+                    TroLySoCaNhan.Services.LocalVaultService.SetCustomVaultPath(dialog.FolderName);
+                    _ = LoadDocumentsAsync();
+                }
             });
 
             _ = LoadDocumentsAsync();
         }
 
-        // ==========================================
-        // LƯU THƯ MỤC MỚI VÀO DB
-        // ==========================================
+        // CÔNG CỤ FORMAT SIZE DUNG LƯỢNG
+        private string FormatSize(long bytes)
+        {
+            if (bytes <= 0) return "0 KB";
+            string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
+            int counter = 0;
+            decimal number = (decimal)bytes;
+            while (Math.Round(number / 1024) >= 1 && counter < suffixes.Length - 1)
+            {
+                number = number / 1024;
+                counter++;
+            }
+            return string.Format("{0:n2} {1}", number, suffixes[counter]);
+        }
+
         private async Task ConfirmCreateFolderAsync()
         {
             IsLoading = true;
-            IsCreateFolderDialogOpen = false; // Đóng hộp thoại
+            IsCreateFolderDialogOpen = false;
             try
             {
                 await Task.Run(() =>
@@ -182,10 +201,29 @@ namespace TroLySoCaNhan.ViewModels
                 var listFolders = new List<StorageFolderItem>();
                 var displayList = new List<StorageTaiLieuItem>();
 
+                int totalCloud = 0;
+                long usedBytes = 0;
+                long remainingBytes = 0;
+
                 await Task.Run(() =>
                 {
                     using var db = new TroLySoCaNhanContext();
 
+                    // --- 1. TÍNH TOÁN DUNG LƯỢNG CLOUD TOÀN CỤC ---
+                    var cloudDocs = db.TaiLieus.Where(t => t.MaChuSoHuu == CurrentUser.DbId && t.DaXoa == false)
+                                     .Select(t => db.PhienBanTaiLieus.OrderByDescending(p => p.NgayCapNhat).FirstOrDefault(p => p.MaTaiLieu == t.Id))
+                                     .Where(p => p != null && p.TrangThaiUpload == 1)
+                                     .ToList();
+
+                    totalCloud = cloudDocs.Count;
+                    usedBytes = cloudDocs.Sum(p => p.KichThuoc); // Tính tổng byte đã dùng
+
+                    // ÁP DỤNG CỨNG DUNG LƯỢNG LÀ 5GB
+                    long maxBytes = 5L * 1024 * 1024 * 1024;
+                    remainingBytes = maxBytes - usedBytes;
+                    if (remainingBytes < 0) remainingBytes = 0; // Đảm bảo không bị số âm nếu lỡ vượt lố
+
+                    // --- 2. TẢI FOLDER & FILE HIỂN THỊ TRONG MỤC HIỆN TẠI ---
                     if (_currentCategoryId == null && string.IsNullOrEmpty(keyword))
                     {
                         var dbFolders = db.DanhMucs.Where(dm => dm.MaChuSoHuu == CurrentUser.DbId).ToList();
@@ -202,7 +240,7 @@ namespace TroLySoCaNhan.ViewModels
                         db.Database.CloseConnection();
                     }
 
-                    IQueryable<TaiLieu> baseQuery = db.TaiLieus.Where(t => t.MaChuSoHuu == CurrentUser.DbId && t.DaXoa == false);
+                    IQueryable<TaiLieu> baseQuery = db.TaiLieus.Where(t => t.MaChuSoHuu == CurrentUser.DbId && t.DaXoa == false && t.MaNhomLuuTru == null);
 
                     if (!string.IsNullOrEmpty(keyword))
                     {
@@ -211,13 +249,9 @@ namespace TroLySoCaNhan.ViewModels
                     else
                     {
                         if (_currentCategoryId == null)
-                        {
-                            baseQuery = db.TaiLieus.FromSqlRaw("SELECT * FROM TaiLieu WHERE MaChuSoHuu = {0} AND DaXoa = 0 AND Id NOT IN (SELECT MaTaiLieu FROM PhanLoaiTaiLieu)", CurrentUser.DbId);
-                        }
+                            baseQuery = db.TaiLieus.FromSqlRaw("SELECT * FROM TaiLieu WHERE MaChuSoHuu = {0} AND DaXoa = 0 AND MaNhomLuuTru IS NULL AND Id NOT IN (SELECT MaTaiLieu FROM PhanLoaiTaiLieu)", CurrentUser.DbId);
                         else
-                        {
-                            baseQuery = db.TaiLieus.FromSqlRaw("SELECT t.* FROM TaiLieu t INNER JOIN PhanLoaiTaiLieu pl ON t.Id = pl.MaTaiLieu WHERE t.MaChuSoHuu = {0} AND t.DaXoa = 0 AND pl.MaDanhMuc = {1}", CurrentUser.DbId, _currentCategoryId.Value);
-                        }
+                            baseQuery = db.TaiLieus.FromSqlRaw("SELECT t.* FROM TaiLieu t INNER JOIN PhanLoaiTaiLieu pl ON t.Id = pl.MaTaiLieu WHERE t.MaChuSoHuu = {0} AND t.DaXoa = 0 AND t.MaNhomLuuTru IS NULL AND pl.MaDanhMuc = {1}", CurrentUser.DbId, _currentCategoryId.Value);
                     }
 
                     var rawList = baseQuery.Select(t => new
@@ -274,6 +308,11 @@ namespace TroLySoCaNhan.ViewModels
                     TaiLieus.Clear();
                     foreach (var item in displayList) TaiLieus.Add(item);
                     TotalItems = displayList.Count;
+
+                    // Bind thông số Cloud ra UI
+                    TotalCloudFiles = totalCloud;
+                    UsedStorageText = FormatSize(usedBytes);
+                    RemainingStorageText = FormatSize(remainingBytes);
                 });
             }
             finally { IsLoading = false; }
@@ -323,11 +362,174 @@ namespace TroLySoCaNhan.ViewModels
             finally { IsLoading = false; }
         }
 
-        private async Task SyncSelectedFileToCloudAsync(StorageTaiLieuItem item) { /* Code ẩn R2 Sync */ }
-        private async Task RemoveFromCloudAsync(StorageTaiLieuItem item) { /* Code ẩn Xóa R2 */ }
-        private async Task RemoveLocalFileAsync(StorageTaiLieuItem item) { /* Code ẩn Xóa Local */ }
-        private async Task OpenTaiLieuAsync(StorageTaiLieuItem item) { /* Code ẩn Mở File */ }
-        private async Task DownloadTaiLieuAsync(StorageTaiLieuItem item) { /* Code ẩn SaveFile */ }
+        private async Task SyncSelectedFileToCloudAsync(StorageTaiLieuItem item)
+        {
+            if (item == null) return;
+            IsLoading = true;
+            try
+            {
+                string objectKey = "";
+                await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    var phienBan = db.PhienBanTaiLieus.FirstOrDefault(p => p.MaTaiLieu == item.DbId);
+                    if (phienBan == null) throw new Exception("Không tìm thấy dữ liệu.");
+                    objectKey = phienBan.ObjectKeyR2;
+                });
+
+                string localEncPath = Path.Combine(TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id), Path.GetFileName(objectKey));
+                if (!File.Exists(localEncPath)) throw new Exception("Không tìm thấy tệp mã hóa trong máy!");
+
+                await Task.Run(async () =>
+                {
+                    await TroLySoCaNhan.Services.CloudflareR2Service.UploadFileAsync(localEncPath, objectKey);
+                    using var db = new TroLySoCaNhanContext();
+                    var phienBanDb = db.PhienBanTaiLieus.FirstOrDefault(p => p.MaTaiLieu == item.DbId);
+                    if (phienBanDb != null) { phienBanDb.TrangThaiUpload = 1; db.SaveChanges(); }
+                });
+                await LoadDocumentsAsync();
+                MessageBox.Show("Đã đồng bộ lên Cloud thành công!");
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi Cloud Sync: " + ex.Message); }
+            finally { IsLoading = false; }
+        }
+
+        private async Task RemoveFromCloudAsync(StorageTaiLieuItem item)
+        {
+            if (item == null || !item.IsOnCloud) return;
+
+            var result = MessageBox.Show($"Bạn có muốn gỡ '{item.TenFile}' khỏi Cloud?\n(Tài liệu vẫn sẽ được giữ lại an toàn trên máy tính của bạn)", "Gỡ khỏi Cloud", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
+            IsLoading = true;
+            try
+            {
+                string objectKey = "";
+                await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    var phienBan = db.PhienBanTaiLieus.FirstOrDefault(p => p.MaTaiLieu == item.DbId);
+                    if (phienBan != null) objectKey = phienBan.ObjectKeyR2;
+                });
+
+                string vaultPath = TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id);
+                string localEncPath = Path.Combine(vaultPath, Path.GetFileName(objectKey));
+
+                if (!File.Exists(localEncPath))
+                {
+                    await TroLySoCaNhan.Services.CloudflareR2Service.DownloadFileAsync(objectKey, localEncPath);
+                }
+
+                await TroLySoCaNhan.Services.CloudflareR2Service.DeleteFileAsync(objectKey);
+
+                await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    var phienBanDb = db.PhienBanTaiLieus.FirstOrDefault(p => p.MaTaiLieu == item.DbId);
+                    if (phienBanDb != null)
+                    {
+                        phienBanDb.TrangThaiUpload = 0;
+                        db.SaveChanges();
+                    }
+                });
+
+                await LoadDocumentsAsync();
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi gỡ khỏi Cloud: " + ex.Message, "Lỗi"); }
+            finally { IsLoading = false; }
+        }
+
+        private async Task RemoveLocalFileAsync(StorageTaiLieuItem item)
+        {
+            if (item == null || !item.IsOnLocal) return;
+
+            if (!item.IsOnCloud)
+            {
+                MessageBox.Show("Tài liệu này CHƯA được đồng bộ lên Cloud. Bạn không thể xóa bản Local để tránh mất dữ liệu vĩnh viễn!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            IsLoading = true;
+            try
+            {
+                string objectKey = "";
+                await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    var phienBan = db.PhienBanTaiLieus.FirstOrDefault(p => p.MaTaiLieu == item.DbId);
+                    if (phienBan != null) objectKey = phienBan.ObjectKeyR2;
+                });
+
+                string localEncPath = Path.Combine(TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id), Path.GetFileName(objectKey));
+                if (File.Exists(localEncPath)) File.Delete(localEncPath);
+
+                await LoadDocumentsAsync();
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi xóa bản Local: " + ex.Message, "Lỗi"); }
+            finally { IsLoading = false; }
+        }
+
+        private async Task OpenTaiLieuAsync(StorageTaiLieuItem item)
+        {
+            if (item == null) return;
+            IsLoading = true;
+            try
+            {
+                string objectKey = "", encryptedFileKey = "";
+                await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    var phienBan = db.PhienBanTaiLieus.OrderByDescending(p => p.NgayCapNhat).FirstOrDefault(p => p.MaTaiLieu == item.DbId);
+                    var chiaSe = db.ChiaSeTaiLieuCaNhans.FirstOrDefault(c => c.MaTaiLieu == item.DbId && c.MaNguoiNhan == CurrentUser.DbId);
+                    if (phienBan == null || chiaSe == null) throw new Exception("Không có quyền mở!");
+                    objectKey = phienBan.ObjectKeyR2; encryptedFileKey = chiaSe.FileKeyDaMaHoa;
+                });
+
+                string localEncPath = Path.Combine(TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id), Path.GetFileName(objectKey));
+                if (!File.Exists(localEncPath)) await TroLySoCaNhan.Services.CloudflareR2Service.DownloadFileAsync(objectKey, localEncPath);
+
+                byte[] aesKey = TroLySoCaNhan.Services.CryptoService.DecryptAesKey(encryptedFileKey!, TroLySoCaNhan.Services.CryptoService.UnprotectPrivateKey(CurrentUser.Id));
+                string tempFilePath = Path.Combine(Path.GetTempPath(), item.TenFile);
+                await TroLySoCaNhan.Services.CryptoService.DecryptFileAsync(localEncPath, tempFilePath, aesKey);
+
+                var process = new System.Diagnostics.Process { StartInfo = new System.Diagnostics.ProcessStartInfo(tempFilePath) { UseShellExecute = true }, EnableRaisingEvents = true };
+                process.Exited += (s, e) => { try { if (File.Exists(tempFilePath)) File.Delete(tempFilePath); } catch { } };
+                process.Start();
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi mở file: " + ex.Message); }
+            finally { IsLoading = false; }
+        }
+
+        private async Task DownloadTaiLieuAsync(StorageTaiLieuItem item)
+        {
+            if (item == null) return;
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog { Title = "Tải tài liệu xuống", FileName = item.TenFile };
+            if (saveFileDialog.ShowDialog() != true) return;
+
+            IsLoading = true;
+            try
+            {
+                string objectKey = "", encryptedFileKey = "";
+                await Task.Run(() =>
+                {
+                    using var db = new TroLySoCaNhanContext();
+                    var pb = db.PhienBanTaiLieus.FirstOrDefault(p => p.MaTaiLieu == item.DbId);
+                    var cs = db.ChiaSeTaiLieuCaNhans.FirstOrDefault(c => c.MaTaiLieu == item.DbId && c.MaNguoiNhan == CurrentUser.DbId);
+                    if (pb == null || cs == null) throw new Exception("Dữ liệu không hợp lệ.");
+                    objectKey = pb.ObjectKeyR2; encryptedFileKey = cs.FileKeyDaMaHoa;
+                });
+
+                string localEncPath = Path.Combine(TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id), Path.GetFileName(objectKey));
+                if (!File.Exists(localEncPath)) await TroLySoCaNhan.Services.CloudflareR2Service.DownloadFileAsync(objectKey, localEncPath);
+
+                byte[] aesKey = TroLySoCaNhan.Services.CryptoService.DecryptAesKey(encryptedFileKey!, TroLySoCaNhan.Services.CryptoService.UnprotectPrivateKey(CurrentUser.Id));
+                await TroLySoCaNhan.Services.CryptoService.DecryptFileAsync(localEncPath, saveFileDialog.FileName, aesKey);
+                MessageBox.Show("Đã tải xuống thành công!");
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi tải xuống: " + ex.Message); }
+            finally { IsLoading = false; }
+        }
+
         private async Task DeleteTaiLieuAsync(StorageTaiLieuItem item)
         {
             if (item == null) return;

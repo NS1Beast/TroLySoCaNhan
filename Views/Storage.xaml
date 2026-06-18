@@ -272,7 +272,6 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0" Style="{StaticResource MiniCardStyle}" Margin="0,0,12,0">
@@ -298,43 +297,27 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Border Width="42" Height="42" CornerRadius="12" Background="#ECFDF5" Margin="0,0,14,0">
-                                <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="#059669" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="CloudCheckmark24" Foreground="#059669" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="Đã mã hóa E2EE" Foreground="#64748B" FontSize="12"/>
-                                <TextBlock Text="100%" Foreground="#0F172A" FontSize="20" FontWeight="Bold"/>
+                                <TextBlock Text="Đã đồng bộ Cloud" Foreground="#64748B" FontSize="12"/>
+                                <TextBlock Text="{Binding TotalCloudFiles, StringFormat='{}{0} File'}" Foreground="#0F172A" FontSize="20" FontWeight="Bold"/>
                             </StackPanel>
                         </Grid>
                     </Border>
 
-                    <Border Grid.Column="2" Style="{StaticResource MiniCardStyle}" Margin="0,0,12,0">
+                    <Border Grid.Column="2" Style="{StaticResource MiniCardStyle}" Margin="0,0,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Border Width="42" Height="42" CornerRadius="12" Background="#FEF3C7" Margin="0,0,14,0">
-                                <ui:SymbolIcon Symbol="CloudArrowUp24" Foreground="#D97706" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <ui:SymbolIcon Symbol="DataPie24" Foreground="#D97706" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="Đã đồng bộ Cloud" Foreground="#64748B" FontSize="12"/>
-                                <TextBlock Text="142 File" Foreground="#0F172A" FontSize="20" FontWeight="Bold"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <Border Grid.Column="3" Style="{StaticResource MiniCardStyle}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Border Width="42" Height="42" CornerRadius="12" Background="#F5F3FF" Margin="0,0,14,0">
-                                <ui:SymbolIcon Symbol="Bot24" Foreground="#7C3AED" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="Tiến độ AI/OCR" Foreground="#64748B" FontSize="12"/>
-                                <TextBlock Text="{Binding TiLeHoanThanh, StringFormat={}{0}%}" Foreground="#0F172A" FontSize="20" FontWeight="Bold"/>
+                                <TextBlock Text="Dung lượng đã dùng" Foreground="#64748B" FontSize="12"/>
+                                <TextBlock Text="{Binding UsedStorageText}" Foreground="#0F172A" FontSize="20" FontWeight="Bold"/>
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -379,14 +362,6 @@
 
                             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
                                 <StackPanel>
-
-                                    <Border CornerRadius="12" Background="#EFF6FF" BorderBrush="#BFDBFE" BorderThickness="1" Padding="12" Margin="0,0,0,16" Visibility="{Binding IsProcessingOcr, Converter={StaticResource BoolToVisibility}}">
-                                        <DockPanel>
-                                            <ui:SymbolIcon Symbol="Scan24" Foreground="#2563EB" FontSize="18" Margin="0,0,8,0" DockPanel.Dock="Left"/>
-                                            <TextBlock Text="AI đang xử lý tài liệu..." Foreground="#1E3A8A" FontWeight="Bold" DockPanel.Dock="Left" VerticalAlignment="Center"/>
-                                            <TextBlock Text="{Binding OcrStatusMessage}" Foreground="#2563EB" HorizontalAlignment="Right" DockPanel.Dock="Right" VerticalAlignment="Center"/>
-                                        </DockPanel>
-                                    </Border>
 
                                     <TextBlock Text="Thư mục" Style="{StaticResource SectionTitleStyle}" Margin="0,0,0,12"/>
                                     <ItemsControl ItemsSource="{Binding Folders}">

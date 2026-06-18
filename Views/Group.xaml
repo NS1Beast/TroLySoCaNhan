@@ -4,310 +4,213 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:local="clr-namespace:TroLySoCaNhan.Views"
+                 xmlns:vm="clr-namespace:TroLySoCaNhan.ViewModels"
+                 xmlns:conv="clr-namespace:TroLySoCaNhan.MVVM.Converters"
+                 xmlns:models="clr-namespace:TroLySoCaNhan.Models"
                  mc:Ignorable="d"
-                 Title="Quản lý nhóm"
-                 Height="780"
-                 Width="1180"
-                 MinHeight="720"
-                 MinWidth="1080"
+                 Title="Quản lý nhóm &amp; Gửi tài liệu"
+                 Height="820" Width="1300"
+                 MinHeight="720" MinWidth="1100"
                  WindowBackdropType="Mica"
                  ExtendsContentIntoTitleBar="True"
                  WindowStartupLocation="CenterScreen"
                  TextOptions.TextFormattingMode="Display"
-                 TextOptions.TextRenderingMode="ClearType">
+                 TextOptions.TextRenderingMode="ClearType"
+                 Background="Transparent">
 
     <ui:FluentWindow.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ThemesDictionary Theme="Light" />
+                <ui:ControlsDictionary />
+            </ResourceDictionary.MergedDictionaries>
 
-        <!-- =========================
-             MÀU CHỦ ĐẠO
-        ========================== -->
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A"/>
-        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
-        <SolidColorBrush x:Key="BluePrimaryBrush" Color="#2563EB"/>
-        <SolidColorBrush x:Key="BlueBorderBrush" Color="#CFE3FF"/>
-        <SolidColorBrush x:Key="SurfaceBrush" Color="#EEFFFFFF"/>
-        <SolidColorBrush x:Key="InputBackgroundBrush" Color="#F8FAFC"/>
-        <SolidColorBrush x:Key="InputBorderBrush" Color="#D8E6FF"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#0F172A"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
+            <SolidColorBrush x:Key="TextMutedBrush" Color="#94A3B8"/>
+            <SolidColorBrush x:Key="BluePrimaryBrush" Color="#2563EB"/>
+            <SolidColorBrush x:Key="BlueDarkBrush" Color="#1D4ED8"/>
+            <SolidColorBrush x:Key="BlueSoftBrush" Color="#EFF6FF"/>
+            <SolidColorBrush x:Key="BlueBorderBrush" Color="#CFE3FF"/>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#EEFFFFFF"/>
+            <SolidColorBrush x:Key="InputBackgroundBrush" Color="#F8FAFC"/>
+            <SolidColorBrush x:Key="InputBorderBrush" Color="#D8E6FF"/>
 
-        <!-- =========================
-             TEXT STYLE
-        ========================== -->
-        <Style x:Key="PageTitleStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="FontSize" Value="28"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
+            <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+            <conv:NullToVisibilityConverter x:Key="NullToVisibility"/>
 
-        <Style x:Key="PageSubTitleStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="LineHeight" Value="21"/>
-        </Style>
+            <Style x:Key="PageTitleStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                <Setter Property="FontSize" Value="28"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+            </Style>
 
-        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="FontSize" Value="17"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
+            <Style x:Key="PageSubTitleStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="LineHeight" Value="21"/>
+            </Style>
 
-        <Style x:Key="MutedTextStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="LineHeight" Value="20"/>
-        </Style>
+            <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                <Setter Property="FontSize" Value="17"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Margin" Value="0,0,0,10"/>
+            </Style>
 
-        <!-- =========================
-             CARD STYLE
-        ========================== -->
-        <Style x:Key="GlassCardStyle" TargetType="Border">
-            <Setter Property="CornerRadius" Value="26"/>
-            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BlueBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="34"
-                                      ShadowDepth="10"
-                                      Opacity="0.13"
-                                      Color="#2563EB"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
+            <Style x:Key="SmallMutedTextStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                <Setter Property="FontSize" Value="13"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+                <Setter Property="LineHeight" Value="20"/>
+            </Style>
 
-        <Style x:Key="SoftCardStyle" TargetType="Border">
-            <Setter Property="CornerRadius" Value="20"/>
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#D8E6FF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="16"/>
-            <Setter Property="Margin" Value="0,0,0,12"/>
-        </Style>
+            <Style x:Key="GlassCardStyle" TargetType="Border">
+                <Setter Property="CornerRadius" Value="20"/>
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource InputBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="18"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect BlurRadius="20" ShadowDepth="5" Opacity="0.08" Color="#2563EB"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-        <Style x:Key="SearchBorderStyle" TargetType="Border">
-            <Setter Property="Height" Value="44"/>
-            <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="Background" Value="{StaticResource InputBackgroundBrush}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource InputBorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-        </Style>
+            <Style x:Key="SearchTextBoxStyle" TargetType="{x:Type ui:TextBox}">
+                <Setter Property="Height" Value="42"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Padding" Value="12,0,12,0"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
 
-        <Style x:Key="SearchTextBoxStyle" TargetType="{x:Type ui:TextBox}">
-            <Setter Property="Height" Value="42"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Padding" Value="12,0,12,0"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
+            <Style x:Key="SearchBorderStyle" TargetType="Border">
+                <Setter Property="Height" Value="44"/>
+                <Setter Property="CornerRadius" Value="16"/>
+                <Setter Property="Background" Value="{StaticResource InputBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource InputBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
 
-        <!-- =========================
-             BUTTON STYLE
-        ========================== -->
-        <Style x:Key="PrimaryButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Height" Value="44"/>
-            <Setter Property="MinWidth" Value="120"/>
-            <Setter Property="Padding" Value="16,0"/>
-            <Setter Property="Background" Value="#2563EB"/>
-            <Setter Property="BorderBrush" Value="#2563EB"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"/>
-                        </Border>
+            <Style x:Key="PrimaryButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Padding" Value="16,0"/>
+                <Setter Property="Background" Value="#2563EB"/>
+                <Setter Property="BorderBrush" Value="#2563EB"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="Root"
+                                    Background="{TemplateBinding Background}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Margin="{TemplateBinding Padding}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Root" Property="Background" Value="#1D4ED8"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Root" Property="Opacity" Value="0.55"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#1D4ED8"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="#1D4ED8"/>
-                            </Trigger>
+            <Style x:Key="SecondaryButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Padding" Value="16,0"/>
+                <Setter Property="Background" Value="#FFFFFF"/>
+                <Setter Property="BorderBrush" Value="#D8E6FF"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Foreground" Value="#0F172A"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="Root"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Margin="{TemplateBinding Padding}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
+                                    <Setter TargetName="Root" Property="BorderBrush" Value="#BFDBFE"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#1E40AF"/>
-                            </Trigger>
+            <Style TargetType="DataGrid">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="RowBackground" Value="#FFFFFF"/>
+                <Setter Property="AlternatingRowBackground" Value="#F8FAFC"/>
+                <Setter Property="HorizontalGridLinesBrush" Value="#D8E6FF"/>
+                <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+                <Setter Property="Foreground" Value="#0F172A"/>
+                <Setter Property="FontSize" Value="13"/>
+            </Style>
 
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Root" Property="Opacity" Value="0.55"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+            <Style TargetType="DataGridColumnHeader">
+                <Setter Property="Background" Value="#EFF6FF"/>
+                <Setter Property="Foreground" Value="#1E3A8A"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Height" Value="42"/>
+                <Setter Property="Padding" Value="12,0"/>
+                <Setter Property="BorderBrush" Value="#D8E6FF"/>
+                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            </Style>
 
-        <Style x:Key="SecondaryButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Height" Value="44"/>
-            <Setter Property="MinWidth" Value="92"/>
-            <Setter Property="Padding" Value="14,0"/>
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#D8E6FF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#0F172A"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="16">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"/>
-                        </Border>
+            <Style TargetType="DataGridCell">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="12,0"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
 
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="#BFDBFE"/>
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#DBEAFE"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="IconButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Width" Value="34"/>
-            <Setter Property="Height" Value="34"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Background" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#D8E6FF"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Root"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="12">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#EFF6FF"/>
-                                <Setter TargetName="Root" Property="BorderBrush" Value="#BFDBFE"/>
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Root" Property="Background" Value="#DBEAFE"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- =========================
-             DATAGRID STYLE
-        ========================== -->
-        <Style TargetType="DataGrid">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="RowBackground" Value="#FFFFFF"/>
-            <Setter Property="AlternatingRowBackground" Value="#F8FAFC"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="#E2E8F0"/>
-            <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="FontSize" Value="13"/>
-        </Style>
-
-        <Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#EFF6FF"/>
-            <Setter Property="Foreground" Value="#1E3A8A"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Height" Value="42"/>
-            <Setter Property="Padding" Value="12,0"/>
-            <Setter Property="BorderBrush" Value="#D8E6FF"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-        </Style>
-
-        <Style TargetType="DataGridRow">
-            <Setter Property="Height" Value="46"/>
-        </Style>
-
-        <Style TargetType="DataGridCell">
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="12,0"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-
+            <Style TargetType="DataGridRow">
+                <Setter Property="Height" Value="46"/>
+            </Style>
+        </ResourceDictionary>
     </ui:FluentWindow.Resources>
 
     <Grid>
-
-        <!-- =========================
-             NỀN GRADIENT
-        ========================== -->
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#FFFFFF" Offset="0.00"/>
-                <GradientStop Color="#F3F9FF" Offset="0.34"/>
-                <GradientStop Color="#DBEAFE" Offset="0.78"/>
-                <GradientStop Color="#EFF6FF" Offset="1.00"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-
-        <Ellipse Width="460"
-                 Height="460"
+        <Ellipse Width="480"
+                 Height="480"
                  HorizontalAlignment="Left"
                  VerticalAlignment="Top"
-                 Margin="-180,-190,0,0"
-                 Opacity="0.48">
+                 Margin="-190,-190,0,0"
+                 Opacity="0.25">
             <Ellipse.Fill>
                 <RadialGradientBrush>
                     <GradientStop Color="#60A5FA" Offset="0"/>
-                    <GradientStop Color="#BFDBFE" Offset="0.55"/>
                     <GradientStop Color="#00FFFFFF" Offset="1"/>
                 </RadialGradientBrush>
             </Ellipse.Fill>
             <Ellipse.Effect>
-                <BlurEffect Radius="42"/>
-            </Ellipse.Effect>
-        </Ellipse>
-
-        <Ellipse Width="560"
-                 Height="560"
-                 HorizontalAlignment="Right"
-                 VerticalAlignment="Bottom"
-                 Margin="0,0,-230,-250"
-                 Opacity="0.42">
-            <Ellipse.Fill>
-                <RadialGradientBrush>
-                    <GradientStop Color="#93C5FD" Offset="0"/>
-                    <GradientStop Color="#DBEAFE" Offset="0.55"/>
-                    <GradientStop Color="#00FFFFFF" Offset="1"/>
-                </RadialGradientBrush>
-            </Ellipse.Fill>
-            <Ellipse.Effect>
-                <BlurEffect Radius="48"/>
+                <BlurEffect Radius="50"/>
             </Ellipse.Effect>
         </Ellipse>
 
@@ -317,818 +220,447 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- =========================
-                 TITLE BAR
-            ========================== -->
             <ui:TitleBar Grid.Row="0"
-                         Title="Quản lý nhóm"
-                         Foreground="#0F172A"
-                         Background="Transparent">
+                         Title="Quản lý Nhóm &amp; Tài liệu"
+                         Background="Transparent"
+                         Foreground="#0F172A">
                 <ui:TitleBar.Icon>
                     <ui:SymbolIcon Symbol="PeopleTeam24" Foreground="#2563EB"/>
                 </ui:TitleBar.Icon>
             </ui:TitleBar>
 
-            <!-- =========================
-                 CONTENT
-            ========================== -->
-            <Grid Grid.Row="1" Margin="28,18,28,26">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <Grid Grid.Row="1" Margin="24,10,24,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <!-- HEADER -->
-                <Grid Grid.Row="0" Margin="0,0,0,18">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <Border Grid.Column="0"
+                        Style="{StaticResource GlassCardStyle}"
+                        Margin="0,0,16,0"
+                        Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                    <StackPanel>
-                        <TextBlock Text="Quản lý nhóm"
-                                   Style="{StaticResource PageTitleStyle}"/>
+                        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                            <DockPanel Margin="0,0,0,10">
+                                <TextBlock Text="Các nhóm của tôi"
+                                           Style="{StaticResource SectionTitleStyle}"
+                                           DockPanel.Dock="Left"
+                                           VerticalAlignment="Center"/>
 
-                        <TextBlock Text="Tạo nhóm lưu trữ, mời thành viên, phân quyền truy cập và theo dõi hoạt động nhóm."
-                                   Style="{StaticResource PageSubTitleStyle}"
-                                   Margin="0,6,0,0"/>
-                    </StackPanel>
+                                <Button Style="{StaticResource SecondaryButtonStyle}"
+                                        Command="{Binding RefreshCommand}"
+                                        HorizontalAlignment="Right"
+                                        DockPanel.Dock="Right"
+                                        Padding="8,4"
+                                        Height="30">
+                                    <ui:SymbolIcon Symbol="ArrowClockwise20" Foreground="#2563EB"/>
+                                </Button>
+                            </DockPanel>
 
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center">
-
-                        <Button x:Name="BtnRefreshGroups"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                Margin="0,0,10,0">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="ArrowClockwise24"
-                                               Foreground="#2563EB"
-                                               FontSize="18"
-                                               Margin="0,0,7,0"/>
-                                <TextBlock Text="Làm mới"
-                                           Foreground="#0F172A"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button x:Name="BtnCreateGroup"
-                                Style="{StaticResource PrimaryButtonStyle}">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:SymbolIcon Symbol="Add24"
-                                               Foreground="White"
-                                               FontSize="18"
-                                               Margin="0,0,7,0"/>
-                                <TextBlock Text="Tạo nhóm"
-                                           Foreground="White"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </Grid>
-
-                <!-- MAIN LAYOUT -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="320"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- =========================
-                         SIDEBAR: DANH SÁCH NHÓM
-                    ========================== -->
-                    <Border Grid.Column="0"
-                            Style="{StaticResource GlassCardStyle}"
-                            Margin="0,0,18,0">
-
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <StackPanel Grid.Row="0" Margin="0,0,0,14">
-                                <TextBlock Text="Nhóm của tôi"
-                                           Style="{StaticResource SectionTitleStyle}"/>
-
-                                <TextBlock Text="Chọn nhóm để quản lý thành viên và quyền truy cập."
-                                           Style="{StaticResource MutedTextStyle}"
-                                           Margin="0,4,0,0"/>
-                            </StackPanel>
-
-                            <Border Grid.Row="1"
-                                    Style="{StaticResource SearchBorderStyle}"
-                                    Margin="0,0,0,14">
-                                <ui:TextBox x:Name="TxtSearchGroup"
-                                            PlaceholderText="Tìm nhóm..."
-                                            Icon="{ui:SymbolIcon Search24}"
-                                            Style="{StaticResource SearchTextBoxStyle}"/>
-                            </Border>
-
-                            <ScrollViewer Grid.Row="2"
-                                          VerticalScrollBarVisibility="Auto">
-                                <StackPanel>
-
-                                    <!-- Demo item 1 -->
-                                    <Button Background="Transparent"
-                                            BorderBrush="Transparent"
-                                            BorderThickness="0"
-                                            Padding="0"
-                                            HorizontalContentAlignment="Stretch"
-                                            Cursor="Hand"
-                                            Margin="0,0,0,10">
-
-                                        <Border CornerRadius="20"
-                                                Background="#EFF6FF"
-                                                BorderBrush="#BFDBFE"
-                                                BorderThickness="1"
-                                                Padding="14">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <Border Width="46"
-                                                        Height="46"
-                                                        CornerRadius="16"
-                                                        Background="#FFFFFF"
-                                                        Margin="0,0,12,0">
-                                                    <ui:SymbolIcon Symbol="PeopleTeam24"
-                                                                   Foreground="#2563EB"
-                                                                   FontSize="24"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center"/>
-                                                </Border>
-
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="Nhóm đồ án"
-                                                               Foreground="#0F172A"
-                                                               FontSize="15"
-                                                               FontWeight="Bold"/>
-
-                                                    <TextBlock Text="5 thành viên • Manager"
-                                                               Foreground="#64748B"
-                                                               FontSize="12"
-                                                               Margin="0,4,0,0"/>
-
-                                                    <TextBlock Text="Quyền: Toàn quyền"
-                                                               Foreground="#2563EB"
-                                                               FontSize="12"
-                                                               FontWeight="SemiBold"
-                                                               Margin="0,4,0,0"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </Button>
-
-                                    <!-- Demo item 2 -->
-                                    <Button Background="Transparent"
-                                            BorderBrush="Transparent"
-                                            BorderThickness="0"
-                                            Padding="0"
-                                            HorizontalContentAlignment="Stretch"
-                                            Cursor="Hand"
-                                            Margin="0,0,0,10">
-
-                                        <Border CornerRadius="20"
-                                                Background="#FFFFFF"
-                                                BorderBrush="#D8E6FF"
-                                                BorderThickness="1"
-                                                Padding="14">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <Border Width="46"
-                                                        Height="46"
-                                                        CornerRadius="16"
-                                                        Background="#F8FAFC"
-                                                        Margin="0,0,12,0">
-                                                    <ui:SymbolIcon Symbol="PeopleTeam24"
-                                                                   Foreground="#64748B"
-                                                                   FontSize="24"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center"/>
-                                                </Border>
-
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="Phòng Marketing"
-                                                               Foreground="#0F172A"
-                                                               FontSize="15"
-                                                               FontWeight="Bold"/>
-
-                                                    <TextBlock Text="12 thành viên • Member"
-                                                               Foreground="#64748B"
-                                                               FontSize="12"
-                                                               Margin="0,4,0,0"/>
-
-                                                    <TextBlock Text="Quyền: Xem, Thêm"
-                                                               Foreground="#64748B"
-                                                               FontSize="12"
-                                                               Margin="0,4,0,0"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </Button>
-
-                                    <!-- Demo item 3 -->
-                                    <Button Background="Transparent"
-                                            BorderBrush="Transparent"
-                                            BorderThickness="0"
-                                            Padding="0"
-                                            HorizontalContentAlignment="Stretch"
-                                            Cursor="Hand">
-
-                                        <Border CornerRadius="20"
-                                                Background="#FFFFFF"
-                                                BorderBrush="#D8E6FF"
-                                                BorderThickness="1"
-                                                Padding="14">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <Border Width="46"
-                                                        Height="46"
-                                                        CornerRadius="16"
-                                                        Background="#F8FAFC"
-                                                        Margin="0,0,12,0">
-                                                    <ui:SymbolIcon Symbol="PeopleTeam24"
-                                                                   Foreground="#64748B"
-                                                                   FontSize="24"
-                                                                   HorizontalAlignment="Center"
-                                                                   VerticalAlignment="Center"/>
-                                                </Border>
-
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="Tài liệu cá nhân chia sẻ"
-                                                               Foreground="#0F172A"
-                                                               FontSize="15"
-                                                               FontWeight="Bold"
-                                                               TextWrapping="Wrap"/>
-
-                                                    <TextBlock Text="3 thành viên • Owner"
-                                                               Foreground="#64748B"
-                                                               FontSize="12"
-                                                               Margin="0,4,0,0"/>
-
-                                                    <TextBlock Text="Quyền: Toàn quyền"
-                                                               Foreground="#64748B"
-                                                               FontSize="12"
-                                                               Margin="0,4,0,0"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </Button>
-
+                            <Button Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding OpenCreateGroupCommand}"
+                                    HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:SymbolIcon Symbol="Add24"
+                                                   FontSize="16"
+                                                   Margin="0,0,8,0"/>
+                                    <TextBlock Text="Tạo nhóm mới"/>
                                 </StackPanel>
-                            </ScrollViewer>
-                        </Grid>
-                    </Border>
+                            </Button>
+                        </StackPanel>
 
-                    <!-- =========================
-                         CENTER: THÔNG TIN NHÓM + THÀNH VIÊN
-                    ========================== -->
-                    <Border Grid.Column="1"
-                            Style="{StaticResource GlassCardStyle}"
-                            Margin="0,0,18,0"
-                            Padding="20">
+                        <ListBox Grid.Row="1"
+                                 ItemsSource="{Binding Groups}"
+                                 SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Margin" Value="0,0,0,8"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="ItemBorder"
+                                                        CornerRadius="12"
+                                                        Padding="12"
+                                                        Background="Transparent"
+                                                        BorderThickness="1"
+                                                        BorderBrush="Transparent">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
 
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
+                                                        <Border Width="42"
+                                                                Height="42"
+                                                                CornerRadius="12"
+                                                                Background="#EFF6FF"
+                                                                Margin="0,0,12,0">
+                                                            <ui:SymbolIcon Symbol="PeopleTeam24"
+                                                                           Foreground="#2563EB"
+                                                                           FontSize="20"
+                                                                           HorizontalAlignment="Center"
+                                                                           VerticalAlignment="Center"/>
+                                                        </Border>
 
-                            <!-- GROUP INFO -->
-                            <Border Grid.Row="0"
-                                    CornerRadius="22"
-                                    Background="#FFFFFF"
-                                    BorderBrush="#D8E6FF"
-                                    BorderThickness="1"
-                                    Padding="18"
-                                    Margin="0,0,0,16">
+                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding TenNhom}"
+                                                                       Foreground="#0F172A"
+                                                                       FontWeight="Bold"
+                                                                       FontSize="14"
+                                                                       TextWrapping="NoWrap"
+                                                                       TextTrimming="CharacterEllipsis"/>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="{Binding SoThanhVien, StringFormat='{}{0} thành viên'}"
+                                                                       Foreground="#64748B"
+                                                                       FontSize="12"
+                                                                       Margin="0,2,0,0"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
 
-                                    <Border Width="62"
-                                            Height="62"
-                                            CornerRadius="22"
-                                            Background="#EFF6FF"
-                                            Margin="0,0,16,0">
-                                        <ui:SymbolIcon Symbol="PeopleTeam24"
-                                                       Foreground="#2563EB"
-                                                       FontSize="32"
-                                                       HorizontalAlignment="Center"
-                                                       VerticalAlignment="Center"/>
-                                    </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="ItemBorder" Property="Background" Value="#F8FAFC"/>
+                                                    </Trigger>
 
-                                    <StackPanel Grid.Column="1"
-                                                VerticalAlignment="Center">
-                                        <TextBlock Text="Nhóm đồ án"
-                                                   Foreground="#0F172A"
-                                                   FontSize="23"
-                                                   FontWeight="Bold"/>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="ItemBorder" Property="Background" Value="#FFFFFF"/>
+                                                        <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#2563EB"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Grid>
+                </Border>
 
-                                        <TextBlock Text="Không gian làm việc chung cho nhóm phát triển ứng dụng Trợ lý số cá nhân."
-                                                   Foreground="#64748B"
-                                                   FontSize="13"
-                                                   TextWrapping="Wrap"
-                                                   Margin="0,5,0,0"/>
+                <Border Grid.Column="1"
+                        Style="{StaticResource GlassCardStyle}"
+                        Padding="0"
+                        ClipToBounds="True">
 
-                                        <WrapPanel Margin="0,10,0,0">
-                                            <Border CornerRadius="14"
-                                                    Background="#EFF6FF"
-                                                    Padding="10,5"
-                                                    Margin="0,0,8,0">
-                                                <TextBlock Text="Vai trò: Owner"
-                                                           Foreground="#1E3A8A"
-                                                           FontSize="12"
-                                                           FontWeight="SemiBold"/>
-                                            </Border>
+                    <Grid Visibility="{Binding SelectedGroup, Converter={StaticResource NullToVisibility}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                                            <Border CornerRadius="14"
-                                                    Background="#ECFDF5"
-                                                    Padding="10,5"
-                                                    Margin="0,0,8,0">
-                                                <TextBlock Text="5 thành viên"
-                                                           Foreground="#047857"
-                                                           FontSize="12"
-                                                           FontWeight="SemiBold"/>
-                                            </Border>
-
-                                            <Border CornerRadius="14"
-                                                    Background="#FEF3C7"
-                                                    Padding="10,5">
-                                                <TextBlock Text="Quyền hạn: 63"
-                                                           Foreground="#92400E"
-                                                           FontSize="12"
-                                                           FontWeight="SemiBold"/>
-                                            </Border>
-                                        </WrapPanel>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="2"
-                                                VerticalAlignment="Center">
-
-                                        <Button x:Name="BtnOpenGroupStorage"
-                                                Style="{StaticResource PrimaryButtonStyle}"
-                                                Margin="0,0,0,10">
-                                            <StackPanel Orientation="Horizontal">
-                                                <ui:SymbolIcon Symbol="Folder24"
-                                                               Foreground="White"
-                                                               FontSize="18"
-                                                               Margin="0,0,7,0"/>
-                                                <TextBlock Text="Mở kho nhóm"
-                                                           Foreground="White"/>
-                                            </StackPanel>
-                                        </Button>
-
-                                        <Button x:Name="BtnEditGroup"
-                                                Style="{StaticResource SecondaryButtonStyle}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <ui:SymbolIcon Symbol="Edit24"
-                                                               Foreground="#2563EB"
-                                                               FontSize="18"
-                                                               Margin="0,0,7,0"/>
-                                                <TextBlock Text="Sửa nhóm"
-                                                           Foreground="#0F172A"/>
-                                            </StackPanel>
-                                        </Button>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-
-                            <!-- MEMBER TOOLBAR -->
-                            <Grid Grid.Row="1" Margin="0,0,0,16">
+                        <Border Grid.Row="0"
+                                Background="#F8FAFC"
+                                BorderBrush="#D8E6FF"
+                                BorderThickness="0,0,0,1"
+                                Padding="20">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel>
-                                    <TextBlock Text="Thành viên trong nhóm"
-                                               Style="{StaticResource SectionTitleStyle}"/>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding SelectedGroup.TenNhom}"
+                                               FontSize="24"
+                                               FontWeight="Bold"
+                                               Foreground="#0F172A"/>
 
-                                    <TextBlock Text="Quản lý thành viên, vai trò và quyền truy cập vào không gian nhóm."
-                                               Style="{StaticResource MutedTextStyle}"
-                                               Margin="0,4,0,0"/>
+                                    <TextBlock Foreground="#64748B"
+                                               FontSize="13"
+                                               Margin="0,4,0,0">
+                                        <Run Text="Vai trò của bạn: "/>
+                                        <Run Text="{Binding SelectedGroup.VaiTroCuaToi}"
+                                             FontWeight="Bold"
+                                             Foreground="#2563EB"/>
+                                    </TextBlock>
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="1"
-                                            Orientation="Horizontal"
-                                            VerticalAlignment="Center">
-
-                                    <Border Style="{StaticResource SearchBorderStyle}"
-                                            Width="260"
-                                            Margin="0,0,10,0">
-                                        <ui:TextBox x:Name="TxtSearchMember"
-                                                    PlaceholderText="Tìm thành viên..."
-                                                    Icon="{ui:SymbolIcon Search24}"
-                                                    Style="{StaticResource SearchTextBoxStyle}"/>
-                                    </Border>
-
-                                    <Button x:Name="BtnAddMember"
-                                            Style="{StaticResource PrimaryButtonStyle}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="PersonAdd24"
-                                                           Foreground="White"
-                                                           FontSize="18"
-                                                           Margin="0,0,7,0"/>
-                                            <TextBlock Text="Thêm thành viên"
-                                                       Foreground="White"/>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Command="{Binding LeaveGroupCommand}"
+                                        Foreground="#EF4444"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="SignOut24"
+                                                       FontSize="16"
+                                                       Margin="0,0,8,0"/>
+                                        <TextBlock Text="Rời nhóm"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
+                        </Border>
 
-                            <!-- MEMBER TABLE -->
-                            <Border Grid.Row="2"
-                                    CornerRadius="20"
-                                    Background="#FFFFFF"
-                                    BorderBrush="#D8E6FF"
-                                    BorderThickness="1"
-                                    ClipToBounds="True">
+                        <ui:TabView Grid.Row="1" Margin="0" Padding="0">
 
-                                    <DataGrid x:Name="DgMembers"
-                                          ItemsSource="{Binding Members}"
-                                          SelectedItem="{Binding SelectedMember, Mode=TwoWay}"
-                                          AutoGenerateColumns="False"
-                                          IsReadOnly="True"
-                                          HeadersVisibility="Column"
-                                          GridLinesVisibility="Horizontal"
-                                          EnableRowVirtualization="True"
-                                          EnableColumnVirtualization="True"
-                                          VirtualizingPanel.IsVirtualizing="True"
-                                          VirtualizingPanel.VirtualizationMode="Recycling"
-                                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                          RowHeight="46"
-                                          AlternationCount="2">
+                            <ui:TabViewItem Header="Thành viên &amp; Quyền hạn">
+                                <Grid Margin="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="300"/>
+                                    </Grid.ColumnDefinitions>
 
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Tên hiển thị"
-                                                            Binding="{Binding TenHienThi}"
-                                                            Width="*"/>
-
-                                        <DataGridTextColumn Header="ID ẩn danh"
-                                                            Binding="{Binding MaNgauNhien}"
-                                                            Width="125"/>
-
-                                        <DataGridTextColumn Header="Email"
-                                                            Binding="{Binding Email}"
-                                                            Width="190"/>
-
-                                        <DataGridTextColumn Header="Vai trò"
-                                                            Binding="{Binding VaiTroTrongNhom}"
-                                                            Width="105"/>
-
-                                        <DataGridTextColumn Header="Quyền"
-                                                            Binding="{Binding QuyenHienThi}"
-                                                            Width="170"/>
-
-                                        <DataGridTextColumn Header="Ngày tham gia"
-                                                            Binding="{Binding NgayThamGia, StringFormat='dd/MM/yyyy'}"
-                                                            Width="115"/>
-
-                                        <DataGridTemplateColumn Header="Thao tác" Width="125">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal"
-                                                                HorizontalAlignment="Center">
-
-                                                        <Button Style="{StaticResource IconButtonStyle}"
-                                                                ToolTip="Sửa quyền"
-                                                                Margin="2,0">
-                                                            <ui:SymbolIcon Symbol="Edit24"
-                                                                           Foreground="#D97706"
-                                                                           FontSize="15"/>
-                                                        </Button>
-
-                                                        <Button Style="{StaticResource IconButtonStyle}"
-                                                                ToolTip="Xóa khỏi nhóm"
-                                                                Margin="2,0">
-                                                            <ui:SymbolIcon Symbol="Delete24"
-                                                                           Foreground="#EF4444"
-                                                                           FontSize="15"/>
-                                                        </Button>
-
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Border>
-                        </Grid>
-                    </Border>
-
-                    <!-- =========================
-                         RIGHT: PHÂN QUYỀN + LỜI MỜI + LOG
-                    ========================== -->
-                    <ScrollViewer Grid.Column="2"
-                                  VerticalScrollBarVisibility="Auto">
-                        <StackPanel>
-
-                            <!-- INVITE MEMBER -->
-                            <Border Style="{StaticResource GlassCardStyle}"
-                                    Padding="18"
-                                    Margin="0,0,0,14">
-                                <StackPanel>
-                                    <TextBlock Text="Mời thành viên"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-
-                                    <TextBlock Text="Tìm người dùng bằng ID ẩn danh hoặc Email để thêm vào nhóm."
-                                               Style="{StaticResource MutedTextStyle}"
-                                               Margin="0,4,0,12"/>
-
-                                    <Border Style="{StaticResource SearchBorderStyle}"
-                                            Margin="0,0,0,10">
-                                        <ui:TextBox x:Name="TxtFindUser"
-                                                    PlaceholderText="UID hoặc Email..."
-                                                    Icon="{ui:SymbolIcon Search24}"
-                                                    Style="{StaticResource SearchTextBoxStyle}"/>
+                                    <Border Grid.Column="0" CornerRadius="16" BorderBrush="#D8E6FF" BorderThickness="1" ClipToBounds="True" Margin="0,0,16,0">
+                                        <DataGrid ItemsSource="{Binding Members}" SelectedItem="{Binding SelectedMember, Mode=TwoWay}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" SelectionMode="Single">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Tên thành viên" Binding="{Binding TenHienThi}" Width="*"/>
+                                                <DataGridTextColumn Header="Mã UID" Binding="{Binding MaNgauNhien}" Width="120"/>
+                                                <DataGridTextColumn Header="Vai trò" Binding="{Binding VaiTroTrongNhom}" Width="100"/>
+                                                <DataGridTextColumn Header="Quyền hạn" Binding="{Binding QuyenHienThi}" Width="150"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
                                     </Border>
 
-                                    <Button x:Name="BtnFindUser"
-                                            Style="{StaticResource SecondaryButtonStyle}"
-                                            Margin="0,0,0,10">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="Search24"
-                                                           Foreground="#2563EB"
-                                                           FontSize="18"
-                                                           Margin="0,0,7,0"/>
-                                            <TextBlock Text="Tìm người dùng"
-                                                       Foreground="#0F172A"/>
-                                        </StackPanel>
-                                    </Button>
+                                    <StackPanel Grid.Column="1">
 
-                                    <Border CornerRadius="18"
-                                            Background="#F8FAFC"
+                                        <StackPanel IsEnabled="{Binding CanManageGroup}">
+                                            <StackPanel.Style>
+                                                <Style TargetType="StackPanel">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsEnabled" Value="False">
+                                                            <Setter Property="Opacity" Value="0.5"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </StackPanel.Style>
+
+                                            <TextBlock Text="Mời thêm thành viên" Style="{StaticResource SectionTitleStyle}"/>
+                                            <ui:TextBox PlaceholderText="Nhập UID người dùng..." Text="{Binding InviteUid, UpdateSourceTrigger=PropertyChanged}" Height="40" Margin="0,0,0,10"/>
+                                            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding InviteMemberCommand}" HorizontalAlignment="Stretch" Margin="0,0,0,24">
+                                                <TextBlock Text="Gửi lời mời tham gia"/>
+                                            </Button>
+                                        </StackPanel>
+
+                                        <Border Visibility="{Binding SelectedMember, Converter={StaticResource NullToVisibility}}" Background="#F8FAFC" BorderBrush="#D8E6FF" BorderThickness="1" CornerRadius="16" Padding="16">
+                                            <StackPanel IsEnabled="{Binding CanEditSelectedMember}">
+                                                <StackPanel.Style>
+                                                    <Style TargetType="StackPanel">
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter Property="Opacity" Value="0.6"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </StackPanel.Style>
+
+                                                <TextBlock Text="Phân quyền (Bitmask)" Style="{StaticResource SectionTitleStyle}"/>
+                                                <TextBlock Text="Đang chọn:" Style="{StaticResource SmallMutedTextStyle}"/>
+                                                <TextBlock Text="{Binding SelectedMember.TenHienThi}" FontWeight="Bold" Foreground="#2563EB" Margin="0,0,0,12"/>
+
+                                                <TextBlock Text="⛔ Bạn không thể sửa quyền người này." Foreground="#EF4444" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,10">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding CanEditSelectedMember}" Value="False">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+
+                                                <CheckBox Content="Xem tài liệu" IsChecked="{Binding SelectedMember.CanView}" Margin="0,0,0,8" Foreground="#0F172A"/>
+                                                <CheckBox Content="Thêm mới/Tải lên" IsChecked="{Binding SelectedMember.CanAdd}" Margin="0,0,0,8" Foreground="#0F172A"/>
+                                                <CheckBox Content="Sửa/Cập nhật bản mới" IsChecked="{Binding SelectedMember.CanEdit}" Margin="0,0,0,8" Foreground="#0F172A"/>
+                                                <CheckBox Content="Xóa tài liệu" IsChecked="{Binding SelectedMember.CanDelete}" Margin="0,0,0,8" Foreground="#0F172A"/>
+                                                <CheckBox Content="Chia sẻ ra ngoài" IsChecked="{Binding SelectedMember.CanShare}" Margin="0,0,0,8" Foreground="#0F172A"/>
+                                                <CheckBox Content="Quản lý thành viên khác" IsChecked="{Binding SelectedMember.CanManage}" Margin="0,0,0,16" Foreground="#0F172A"/>
+
+                                                <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveMemberPermissionCommand}" HorizontalAlignment="Stretch" Margin="0,0,0,8">
+                                                    <TextBlock Text="Lưu quyền hạn"/>
+                                                </Button>
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding RemoveMemberCommand}" Foreground="#EF4444" HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="Khai trừ khỏi nhóm"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </ui:TabViewItem>
+
+                            <ui:TabViewItem Header="Tài liệu Nhóm">
+                                <Grid Margin="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="300"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0"
+                                            CornerRadius="16"
                                             BorderBrush="#D8E6FF"
                                             BorderThickness="1"
-                                            Padding="12"
-                                            Margin="0,0,0,12">
-                                        <Grid>
+                                            ClipToBounds="True"
+                                            Margin="0,0,16,0">
+
+                                        <DataGrid ItemsSource="{Binding Documents}"
+                                                  SelectedItem="{Binding SelectedDocument, Mode=TwoWay}"
+                                                  AutoGenerateColumns="False"
+                                                  IsReadOnly="True"
+                                                  HeadersVisibility="Column"
+                                                  SelectionMode="Single">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Tên File" Binding="{Binding TenFile}" Width="*"/>
+                                                <DataGridTextColumn Header="Dung lượng" Binding="{Binding DungLuongHienThi}" Width="100"/>
+                                                <DataGridTextColumn Header="Người up" Binding="{Binding NguoiUp}" Width="150"/>
+                                                <DataGridTextColumn Header="Cập nhật" Binding="{Binding NgayCapNhat, StringFormat='dd/MM/yyyy HH:mm'}" Width="140"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1">
+                                        <Button Style="{StaticResource PrimaryButtonStyle}"
+                                                Command="{Binding UploadGroupDocCommand}"
+                                                HorizontalAlignment="Stretch"
+                                                Margin="0,0,0,10">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ui:SymbolIcon Symbol="ArrowUpload24" FontSize="18" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Tải file lên nhóm"/>
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Grid Visibility="{Binding SelectedDocument, Converter={StaticResource NullToVisibility}}" Margin="0,0,0,20">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="10"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <Border Width="42"
-                                                    Height="42"
-                                                    CornerRadius="15"
-                                                    Background="#EFF6FF"
-                                                    Margin="0,0,10,0">
-                                                <ui:SymbolIcon Symbol="Person24"
-                                                               Foreground="#2563EB"
-                                                               FontSize="22"
-                                                               HorizontalAlignment="Center"
-                                                               VerticalAlignment="Center"/>
-                                            </Border>
+                                            <Button Grid.Column="0" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding DownloadGroupDocCommand}" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Tải xuống"/>
+                                            </Button>
 
-                                            <StackPanel Grid.Column="1">
-                                                <TextBlock Text="Nguyễn Văn A"
-                                                           Foreground="#0F172A"
-                                                           FontWeight="Bold"/>
+                                            <Button Grid.Column="2" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding DeleteGroupDocCommand}" Foreground="#EF4444" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Xóa file"/>
+                                            </Button>
+                                        </Grid>
 
-                                                <TextBlock Text="UID-8A9B2C"
-                                                           Foreground="#64748B"
-                                                           FontSize="12"
-                                                           Margin="0,3,0,0"/>
+                                        <Border Visibility="{Binding CanEditSelectedDocument, Converter={StaticResource BoolToVisibility}}"
+                                                Background="#F8FAFC"
+                                                BorderBrush="#D8E6FF"
+                                                BorderThickness="1"
+                                                CornerRadius="16"
+                                                Padding="16">
+                                            <StackPanel>
+                                                <TextBlock Text="Giới hạn tài liệu này" Style="{StaticResource SectionTitleStyle}"/>
+
+                                                <TextBlock Text="Áp dụng quy tắc bổ sung đè lên quyền của nhóm." Style="{StaticResource SmallMutedTextStyle}" Margin="0,0,0,12"/>
+
+                                                <CheckBox Content="Chỉ xem (Khóa Edit/Upload đè)" IsChecked="{Binding SelectedDocument.IsReadOnly}" Margin="0,0,0,8" Foreground="#0F172A"/>
+
+                                                <CheckBox Content="Chỉ Quản lý nhóm mới được xem" IsChecked="{Binding SelectedDocument.IsManagerOnly}" Margin="0,0,0,16" Foreground="#0F172A"/>
+
+                                                <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveDocPermissionCommand}" HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="Lưu giới hạn"/>
+                                                </Button>
                                             </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Grid>
+                            </ui:TabViewItem>
+
+                            <ui:TabViewItem Header="Chuyển phát nhanh (Bulk Share)">
+                                <Grid Margin="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="340"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0" CornerRadius="16" BorderBrush="#D8E6FF" BorderThickness="1" Padding="16" Margin="0,0,16,0">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <DockPanel Grid.Row="0" Margin="0,0,0,12">
+                                                <TextBlock Text="Danh sách tài liệu đính kèm" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+
+                                                <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding AddFileToSendListCommand}" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                                    <TextBlock Text="+ Thêm file đang chọn ở Tab Tài liệu"/>
+                                                </Button>
+                                            </DockPanel>
+
+                                            <DataGrid Grid.Row="1" ItemsSource="{Binding SelectedDocsToSend}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Tên File" Binding="{Binding TenFile}" Width="*"/>
+                                                    <DataGridTextColumn Header="Dung lượng" Binding="{Binding DungLuongHienThi}" Width="100"/>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
                                         </Grid>
                                     </Border>
 
-                                    <Button x:Name="BtnSendInvite"
-                                            Style="{StaticResource PrimaryButtonStyle}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="PersonAdd24"
-                                                           Foreground="White"
-                                                           FontSize="18"
-                                                           Margin="0,0,7,0"/>
-                                            <TextBlock Text="Gửi lời mời"
-                                                       Foreground="White"/>
+                                    <Border Grid.Column="1" Background="#F8FAFC" CornerRadius="16" BorderBrush="#D8E6FF" BorderThickness="1" Padding="20">
+                                        <StackPanel>
+                                            <TextBlock Text="Người nhận" Style="{StaticResource SectionTitleStyle}"/>
+
+                                            <TextBlock Text="Nhập các ID ẩn danh (UID) của người nhận, phân cách nhau bằng dấu phẩy." Style="{StaticResource SmallMutedTextStyle}" Margin="0,0,0,12"/>
+
+                                            <ui:TextBox Text="{Binding BulkShareUids, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" AcceptsReturn="True" Height="100" VerticalContentAlignment="Top" Padding="12" PlaceholderText="VD: UID-123456, UID-ABCDEF..." Margin="0,0,0,20" Background="White" BorderBrush="#D8E6FF" BorderThickness="1"/>
+
+                                            <TextBlock Text="Cấu hình gửi" Style="{StaticResource SectionTitleStyle}"/>
+
+                                            <TextBlock Text="Mỗi file sẽ được mã hóa E2EE bằng Public Key của từng người nhận tương ứng." Style="{StaticResource SmallMutedTextStyle}" Margin="0,0,0,12"/>
+
+                                            <CheckBox Content="Cho phép người nhận sửa/up bản mới" Foreground="#0F172A" Margin="0,0,0,24"/>
+
+                                            <Button Style="{StaticResource PrimaryButtonStyle}" Command="{Binding BulkShareCommand}" Background="#059669" BorderBrush="#059669" HorizontalAlignment="Stretch" Margin="0,0,0,10">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ui:SymbolIcon Symbol="Send24" FontSize="18" Margin="0,0,8,0"/>
+                                                    <TextBlock Text="Gửi bảo mật E2EE ngay"/>
+                                                </StackPanel>
+                                            </Button>
+
+                                            <Button Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearSendListCommand}" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Làm lại từ đầu"/>
+                                            </Button>
                                         </StackPanel>
-                                    </Button>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- PERMISSION -->
-                            <Border Style="{StaticResource GlassCardStyle}"
-                                    Padding="18"
-                                    Margin="0,0,0,14">
-                                <StackPanel>
-                                    <TextBlock Text="Phân quyền thành viên"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-
-                                    <TextBlock Text="Chọn quyền theo bitmask cho thành viên đang được chọn."
-                                               Style="{StaticResource MutedTextStyle}"
-                                               Margin="0,4,0,12"/>
-
-                                    <CheckBox x:Name="ChkView"
-                                              Content="Xem tài liệu"
-                                              IsChecked="True"
-                                              FontSize="14"
-                                              Foreground="#0F172A"
-                                              Margin="0,0,0,8"/>
-
-                                    <CheckBox x:Name="ChkAdd"
-                                              Content="Thêm tài liệu"
-                                              IsChecked="True"
-                                              FontSize="14"
-                                              Foreground="#0F172A"
-                                              Margin="0,0,0,8"/>
-
-                                    <CheckBox x:Name="ChkEdit"
-                                              Content="Sửa / cập nhật phiên bản"
-                                              FontSize="14"
-                                              Foreground="#0F172A"
-                                              Margin="0,0,0,8"/>
-
-                                    <CheckBox x:Name="ChkDelete"
-                                              Content="Xóa tài liệu"
-                                              FontSize="14"
-                                              Foreground="#0F172A"
-                                              Margin="0,0,0,8"/>
-
-                                    <CheckBox x:Name="ChkShare"
-                                              Content="Chia sẻ tài liệu"
-                                              IsChecked="True"
-                                              FontSize="14"
-                                              Foreground="#0F172A"
-                                              Margin="0,0,0,8"/>
-
-                                    <CheckBox x:Name="ChkManageMember"
-                                              Content="Quản lý thành viên"
-                                              FontSize="14"
-                                              Foreground="#0F172A"
-                                              Margin="0,0,0,12"/>
-
-                                    <Border CornerRadius="16"
-                                            Background="#EFF6FF"
-                                            BorderBrush="#BFDBFE"
-                                            BorderThickness="1"
-                                            Padding="12"
-                                            Margin="0,0,0,12">
-                                        <TextBlock Foreground="#1E3A8A"
-                                                   FontSize="13"
-                                                   TextWrapping="Wrap">
-                                            <Run Text="Giá trị quyền hiện tại: "/>
-                                            <Run Text="19" FontWeight="Bold"/>
-                                            <Run Text="  (Xem + Thêm + Chia sẻ)"/>
-                                        </TextBlock>
                                     </Border>
+                                </Grid>
+                            </ui:TabViewItem>
 
-                                    <Button x:Name="BtnSavePermission"
-                                            Style="{StaticResource PrimaryButtonStyle}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:SymbolIcon Symbol="Settings24"
-                                                           Foreground="White"
-                                                           FontSize="18"
-                                                           Margin="0,0,7,0"/>
-                                            <TextBlock Text="Lưu quyền"
-                                                       Foreground="White"/>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- ACTIVITY -->
-                            <Border Style="{StaticResource SoftCardStyle}"
-                                    Margin="0,0,0,14">
-                                <StackPanel>
-                                    <TextBlock Text="Hoạt động nhóm"
-                                               Style="{StaticResource SectionTitleStyle}"/>
-
-                                    <StackPanel Margin="0,10,0,0">
-
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                            <Border Width="32"
-                                                    Height="32"
-                                                    CornerRadius="12"
-                                                    Background="#ECFDF5"
-                                                    Margin="0,0,10,0">
-                                                <ui:SymbolIcon Symbol="PersonAdd24"
-                                                               Foreground="#059669"
-                                                               FontSize="17"
-                                                               HorizontalAlignment="Center"
-                                                               VerticalAlignment="Center"/>
-                                            </Border>
-
-                                            <StackPanel>
-                                                <TextBlock Text="Đã thêm thành viên mới"
-                                                           Foreground="#0F172A"
-                                                           FontWeight="SemiBold"
-                                                           FontSize="13"/>
-                                                <TextBlock Text="Vừa xong"
-                                                           Foreground="#64748B"
-                                                           FontSize="12"/>
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                            <Border Width="32"
-                                                    Height="32"
-                                                    CornerRadius="12"
-                                                    Background="#FEF3C7"
-                                                    Margin="0,0,10,0">
-                                                <ui:SymbolIcon Symbol="Edit24"
-                                                               Foreground="#D97706"
-                                                               FontSize="17"
-                                                               HorizontalAlignment="Center"
-                                                               VerticalAlignment="Center"/>
-                                            </Border>
-
-                                            <StackPanel>
-                                                <TextBlock Text="Quyền thành viên đã thay đổi"
-                                                           Foreground="#0F172A"
-                                                           FontWeight="SemiBold"
-                                                           FontSize="13"/>
-                                                <TextBlock Text="Hôm nay"
-                                                           Foreground="#64748B"
-                                                           FontSize="12"/>
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <StackPanel Orientation="Horizontal">
-                                            <Border Width="32"
-                                                    Height="32"
-                                                    CornerRadius="12"
-                                                    Background="#EFF6FF"
-                                                    Margin="0,0,10,0">
-                                                <ui:SymbolIcon Symbol="Folder24"
-                                                               Foreground="#2563EB"
-                                                               FontSize="17"
-                                                               HorizontalAlignment="Center"
-                                                               VerticalAlignment="Center"/>
-                                            </Border>
-
-                                            <StackPanel>
-                                                <TextBlock Text="Kho nhóm được mở gần đây"
-                                                           Foreground="#0F172A"
-                                                           FontWeight="SemiBold"
-                                                           FontSize="13"/>
-                                                <TextBlock Text="Gần đây"
-                                                           Foreground="#64748B"
-                                                           FontSize="12"/>
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- DANGER ZONE -->
-                            <Border CornerRadius="22"
-                                    Background="#FEF2F2"
-                                    BorderBrush="#FECACA"
-                                    BorderThickness="1"
-                                    Padding="16">
-                                <StackPanel>
-                                    <TextBlock Text="Vùng nguy hiểm"
-                                               Foreground="#991B1B"
-                                               FontSize="17"
-                                               FontWeight="Bold"/>
-
-                                    <TextBlock Text="Chỉ chủ nhóm hoặc người có quyền quản lý thành viên mới được xóa nhóm hoặc rời nhóm."
-                                               Foreground="#991B1B"
-                                               FontSize="13"
-                                               TextWrapping="Wrap"
-                                               LineHeight="20"
-                                               Margin="0,6,0,12"/>
-
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button x:Name="BtnLeaveGroup"
-                                                Style="{StaticResource SecondaryButtonStyle}"
-                                                Margin="0,0,10,0">
-                                            <TextBlock Text="Rời nhóm"
-                                                       Foreground="#991B1B"/>
-                                        </Button>
-
-                                        <Button x:Name="BtnDeleteGroup"
-                                                Style="{StaticResource SecondaryButtonStyle}">
-                                            <TextBlock Text="Xóa nhóm"
-                                                       Foreground="#991B1B"/>
-                                        </Button>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                        </StackPanel>
-                    </ScrollViewer>
-                </Grid>
+                        </ui:TabView>
+                    </Grid>
+                </Border>
             </Grid>
+        </Grid>
+
+        <Grid Background="#66000000" Visibility="{Binding IsCreateGroupDialogOpen, Converter={StaticResource BoolToVisibility}}" Panel.ZIndex="100">
+            <Border Width="420" Background="{StaticResource SurfaceBrush}" CornerRadius="16" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="28">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30" ShadowDepth="8" Opacity="0.15" Color="#0F172A"/>
+                </Border.Effect>
+
+                <StackPanel>
+                    <TextBlock Text="Tạo Không gian nhóm" FontSize="20" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
+
+                    <TextBlock Text="Khởi tạo nơi làm việc chung an toàn." Foreground="#64748B" Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Tên nhóm lưu trữ" Foreground="#64748B" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6"/>
+
+                    <ui:TextBox PlaceholderText="Ví dụ: Team Marketing, Nhóm học tập..." Text="{Binding NewGroupName, UpdateSourceTrigger=PropertyChanged}" Height="42" Margin="0,0,0,24"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Content="Hủy bỏ" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CloseCreateGroupCommand}" HorizontalAlignment="Stretch"/>
+
+                        <Button Grid.Column="2" Content="Tạo nhóm" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding ConfirmCreateGroupCommand}" HorizontalAlignment="Stretch"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </ui:FluentWindow>
