@@ -26,6 +26,10 @@ namespace TroLySoCaNhan.ViewModels
         private int _totalItems;
         public int TotalItems { get => _totalItems; set => SetProperty(ref _totalItems, value); }
 
+        // 💡 THÊM THUỘC TÍNH HIỂN THỊ GÓI DỊCH VỤ
+        private string _currentPlanDisplay = "Gói thường";
+        public string CurrentPlanDisplay { get => _currentPlanDisplay; set => SetProperty(ref _currentPlanDisplay, value); }
+
         private bool _isLoading;
         public bool IsLoading
         {
@@ -130,7 +134,7 @@ namespace TroLySoCaNhan.ViewModels
                 UserName = string.IsNullOrEmpty(userDb.TenDangNhap) ? userDb.Email : userDb.TenDangNhap,
                 DisplayName = userDb.TenHienThi,
                 Email = userDb.Email,
-                Plan = "Miễn phí"
+                Plan = "Gói thường"
             };
 
             LoadDocumentsCommand = new RelayCommand(async _ => await LoadDocumentsAsync(), _ => !IsLoading);
@@ -197,7 +201,14 @@ namespace TroLySoCaNhan.ViewModels
 
             OpenProfileCommand = new RelayCommand(_ => ProfileRequested?.Invoke(this, EventArgs.Empty));
             OpenSettingsCommand = new RelayCommand(_ => SettingsRequested?.Invoke(this, EventArgs.Empty));
-            OpenUpgradeCommand = new RelayCommand(_ => UpgradeRequested?.Invoke(this, EventArgs.Empty));
+
+            // 💡 CẬP NHẬT LẠI LỆNH NÀY: MỞ CỬA HÀNG XONG LÀ TỰ ĐỘNG LOAD LẠI DATA
+            OpenUpgradeCommand = new RelayCommand(_ =>
+            {
+                UpgradeRequested?.Invoke(this, EventArgs.Empty);
+                _ = LoadDocumentsAsync();
+            });
+
             OpenGroupCommand = new RelayCommand(_ => GroupRequested?.Invoke(this, EventArgs.Empty));
             OpenStorageCommand = new RelayCommand(_ => StorageRequested?.Invoke(this, EventArgs.Empty));
 
@@ -211,11 +222,29 @@ namespace TroLySoCaNhan.ViewModels
             {
                 string vaultPath = TroLySoCaNhan.Services.LocalVaultService.GetVaultPath(CurrentUser.Id);
                 string keyword = SearchKeyword?.Trim().ToLower() ?? "";
+                string fetchedPlanName = "Gói thường";
 
                 var listFiles = await Task.Run(() =>
                 {
                     using var db = new TroLySoCaNhanContext();
 
+                    // 1. TỰ ĐỘNG KIỂM TRA GÓI CƯỚC TỪ LỊCH SỬ GIAO DỊCH
+                    try
+                    {
+                        var latestPlan = (from ls in db.LichSuGiaoDiches
+                                          join g in db.GoiDichVus on ls.MaGoiDichVu equals g.Id
+                                          where ls.MaNguoiDung == CurrentUser.DbId && ls.LoaiGiaoDich == 2 && ls.TrangThai == 1
+                                          orderby ls.NgayGiaoDich descending
+                                          select g.TenGoi).FirstOrDefault();
+
+                        if (!string.IsNullOrEmpty(latestPlan))
+                        {
+                            fetchedPlanName = latestPlan;
+                        }
+                    }
+                    catch { /* Bỏ qua nếu chưa có bảng để ứng dụng không bị Crash */ }
+
+                    // 2. QUERY DANH SÁCH FILE (Giữ nguyên như cũ)
                     var query = db.TaiLieus
                         .Where(t => t.MaChuSoHuu == CurrentUser.DbId && t.DaXoa == false)
                         .Select(t => new
@@ -286,6 +315,9 @@ namespace TroLySoCaNhan.ViewModels
                         };
                     }).ToList();
                 });
+
+                // Cập nhật lại UI Plan sau khi quét DB xong
+                CurrentPlanDisplay = fetchedPlanName;
 
                 TaiLieus.Clear();
                 foreach (var item in listFiles) TaiLieus.Add(item);
@@ -525,7 +557,6 @@ namespace TroLySoCaNhan.ViewModels
                     {
                         if (phienBan != null) objectKeyR2 = phienBan.ObjectKeyR2;
 
-                        // Xóa liên kết trong bảng trung gian trước
                         db.Database.ExecuteSqlRaw("DELETE FROM PhanLoaiTaiLieu WHERE MaTaiLieu = {0}", item.DbId);
 
                         db.ChiaSeTaiLieuCaNhans.RemoveRange(db.ChiaSeTaiLieuCaNhans.Where(c => c.MaTaiLieu == item.DbId));

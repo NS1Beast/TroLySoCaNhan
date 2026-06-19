@@ -68,7 +68,7 @@ namespace TroLySoCaNhan.ViewModels
         public RelayCommand ClearLogsCommand { get; }
 
         // MÃ API KEY CỦA GOOGLE GEMINI
-        private readonly string GEMINI_API_KEY = "AQ.Ab8RN6LIGui00dPJ9p-UOgdKAHxX7sSPDpUD-jV6rOQs4yaDsA";
+        private readonly string GEMINI_API_KEY = "AQ.Ab8RN6JQFagAzOBZCoDLwgKq4FzbIRMitM-nKhCelHmCWACB0Q";
 
         public OcrViewModel(UserDto user)
         {

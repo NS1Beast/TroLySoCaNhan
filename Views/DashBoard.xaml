@@ -416,7 +416,7 @@
                             </Border>
                             <StackPanel Grid.Column="1">
                                 <TextBlock Text="Gói dịch vụ" Foreground="#64748B" FontSize="13"/>
-                                <TextBlock Text="{Binding CurrentUser.Plan}" Foreground="#0F172A" FontSize="24" FontWeight="Bold" Margin="0,4,0,0"/>
+                                <TextBlock Text="{Binding CurrentPlanDisplay}" Foreground="#0F172A" FontSize="24" FontWeight="Bold" Margin="0,4,0,0"/>
                             </StackPanel>
                         </Grid>
                     </Border>
