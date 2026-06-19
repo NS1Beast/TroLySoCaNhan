@@ -241,7 +241,6 @@ namespace TroLySoCaNhan.ViewModels
                             {
                                 using (DocX document = DocX.Create(outPath))
                                 {
-                                    document.InsertParagraph("=== KẾT QUẢ TRÍCH XUẤT TỪ GEMINI AI ===").Bold().FontSize(14).SpacingAfter(10);
                                     document.InsertParagraph(extractedText).FontSize(12);
                                     document.Save();
                                 }

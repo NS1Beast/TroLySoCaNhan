@@ -29,10 +29,8 @@ namespace TroLySoCaNhan.Views
 
             vm.UpgradeRequested += (_, _) =>
             {
-                this.Hide();
                 var upgradeWindow = new UpgradeDialog(vm.CurrentUser) { Owner = this };
                 upgradeWindow.ShowDialog();
-                this.Show();
             };
 
             vm.GroupRequested += (_, _) =>
